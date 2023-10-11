@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class Users {
 
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     @TableField("username")
     private String username;
@@ -41,7 +41,7 @@ public class Users {
     @TableField("is_delete")
     private Integer is_delete = 0;
 
-    public int getid() {
+    public Integer getid() {
         return id;
     }
 
@@ -55,10 +55,6 @@ public class Users {
 
     public String getLastlogin() {
         return lastlogin;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public void setUsername(String username) {

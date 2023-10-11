@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface IVipGuestsService extends IService<VipGuests> {
     List<VipGuests> getVipGuests(String name, String registertime, Integer start, Integer size);
+
+    Boolean insertVipGuests(String name, String registertime, String conway, Integer balance);
 }
