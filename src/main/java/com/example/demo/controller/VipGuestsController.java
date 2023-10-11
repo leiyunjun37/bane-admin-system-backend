@@ -5,11 +5,11 @@ import com.example.demo.service.IVipGuestsService;
 import com.example.demo.utils.PageResult;
 import com.example.demo.utils.PageResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import com.example.demo.utils.RequestBody.Vipguests.VipguestInsertObject;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -29,6 +29,19 @@ public class VipGuestsController {
         PageResult result = PageResultUtils.success(vipGuests);
         result.setMessage("select success");
         return result;
+    }
 
+    @PostMapping("/post")
+    public PageResult insert(@RequestBody VipguestInsertObject requestBody) {
+        String name = requestBody.getName();
+        String conway = requestBody.getConway();
+        Integer balance = requestBody.getBalance();
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String registertime = currentDate.format(formatter);
+        Boolean insert = vipGuestsService.insertVipGuests(name, registertime, conway, balance);
+        PageResult result = PageResultUtils.success(insert);
+        result.setMessage("insert success");
+        return result;
     }
 }
