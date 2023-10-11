@@ -4,7 +4,13 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data // 此注解自动生成getter和setter，toString，equals和hashCode等方法
+@NoArgsConstructor // 此注解生成无参构造函数
+@AllArgsConstructor // 此注解生成全参构造函数
 @TableName("vipguests")
 public class VipGuests {
 
@@ -28,56 +34,4 @@ public class VipGuests {
 
     @TableField("is_delete")
     private Integer is_delete = 0;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getBalance() {
-        return balance;
-    }
-
-    public void setBalance(int balance) {
-        this.balance = balance;
-    }
-
-    public String getConway() {
-        return conway;
-    }
-
-    public void setConway(String conway) {
-        this.conway = conway;
-    }
-
-    public String getLastshop() {
-        return lastshop;
-    }
-
-    public void setLastshop(String lastshop) {
-        this.lastshop = lastshop;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getRegistertime() {
-        return registertime;
-    }
-
-    public void setRegistertime(String registertime) {
-        this.registertime = registertime;
-    }
-
-    public void setIs_delete(Integer is_delete) {
-        this.is_delete = is_delete;
-    }
 }

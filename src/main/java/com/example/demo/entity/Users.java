@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 /**
@@ -15,6 +17,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 * @author jobob
 * @since 2023-10-10
 */
+@Data // 此注解自动生成getter和setter，toString，equals和hashCode等方法
+@NoArgsConstructor // 此注解生成无参构造函数
+@AllArgsConstructor // 此注解生成全参构造函数
 @TableName("users")
 public class Users {
 
