@@ -18,6 +18,5 @@ import java.util.List;
  */
 @Mapper
 public interface UsersMapper extends BaseMapper<Users> {
-    @Select("SELECT * FROM users WHERE is_delete = 0 LIMIT #{start}, 10")
-    List<Users> selectUsers(Integer start);
+
 }
