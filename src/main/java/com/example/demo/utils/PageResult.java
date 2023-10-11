@@ -11,6 +11,12 @@ public class PageResult<T> {
 
     private T data;
 
+    private String message;
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public void setCode(Integer code) {
         this.code = code;
     }
