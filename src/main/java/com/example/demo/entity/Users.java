@@ -41,40 +41,4 @@ public class Users {
     @TableField("is_delete")
     private Integer is_delete = 0;
 
-    public Integer getid() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getManagement() {
-        return management;
-    }
-
-    public String getLastlogin() {
-        return lastlogin;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setManagement(String management) {
-        this.management = management;
-    }
-
-    public void setLastlogin(String lastlogin) {
-        this.lastlogin = lastlogin;
-    }
-
-    public void setIs_delete(Integer is_delete) {
-        this.is_delete = is_delete;
-    }
-
 }
