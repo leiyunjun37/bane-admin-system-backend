@@ -15,6 +15,6 @@ import java.util.List;
  */
 public interface IUsersService extends IService<Users> {
 
-    List<Users> getUsers(String username, String management, Integer start, Integer end);
+    List<Users> getUsers(String username, String management, Integer start, Integer size);
 
 }

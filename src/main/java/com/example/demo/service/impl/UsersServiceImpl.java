@@ -26,12 +26,12 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     private UsersMapper usersMapper;
 
     @Override
-    public List<Users> getUsers(String username, String management, Integer start, Integer end) {
+    public List<Users> getUsers(String username, String management, Integer start, Integer size) {
         QueryWrapper<Users> wrapper = new QueryWrapper<>();
         wrapper.like("username", username);
         wrapper.like("management", management);
         wrapper.eq("is_delete", 0);
-        Page<Users> page = new Page<>(start, end);
+        Page<Users> page = new Page<>(start, size);
         return usersMapper.selectPage(page, wrapper).getRecords();
     }
 

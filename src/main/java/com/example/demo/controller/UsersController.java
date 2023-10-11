@@ -26,10 +26,14 @@ public class UsersController {
     private IUsersService usersService;
 
     @GetMapping("/get")
-    public PageResult select(@RequestParam("page") Integer page, @RequestParam("username") String username, @RequestParam("management") String management, @RequestParam("size") Integer size) {
-        Integer start = (page - 1) * size;
-        Integer end = start + size;
-        List<Users> users = usersService.getUsers(username, management, start, end);
-        return PageResultUtils.success(users);
+    public PageResult select(@RequestParam("page") Integer page,
+                             @RequestParam("username") String username,
+                             @RequestParam("management") String management,
+                             @RequestParam("size") Integer size) {
+        Integer start = (page - 1) * size + 1;
+        List<Users> users = usersService.getUsers(username, management, start, size);
+        PageResult result = PageResultUtils.success(users);
+        result.setMessage("select success");
+        return result;
     }
 }
