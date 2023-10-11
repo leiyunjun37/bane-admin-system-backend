@@ -9,13 +9,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 public class VipGuests {
 
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     @TableField("name")
     private String name;
 
     @TableField("balance")
-    private int balance;
+    private Integer balance;
 
     @TableField("conway")
     private String conway;
@@ -29,15 +29,11 @@ public class VipGuests {
     @TableField("is_delete")
     private Integer is_delete = 0;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getBalance() {
+    public Integer getBalance() {
         return balance;
     }
 

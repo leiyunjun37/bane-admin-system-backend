@@ -27,4 +27,16 @@ public class VipGuestsServiceImpl extends ServiceImpl<VipGuestsMapper, VipGuests
         return vipGuestsMapper.selectPage(page, wrapper).getRecords();
     }
 
+    @Override
+    public Boolean insertVipGuests(String name, String registertime, String conway, Integer balance) {
+        VipGuests vipGuests = new VipGuests();
+        vipGuests.setBalance(balance);
+        vipGuests.setConway(conway);
+        vipGuests.setIs_delete(0);
+        vipGuests.setLastshop("-");
+        vipGuests.setName(name);
+        vipGuests.setRegistertime(registertime);
+        vipGuestsMapper.insert(vipGuests);
+        return true;
+    }
 }
