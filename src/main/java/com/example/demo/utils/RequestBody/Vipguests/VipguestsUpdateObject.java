@@ -3,12 +3,11 @@ package com.example.demo.utils.RequestBody.Vipguests;
 import lombok.Data;
 
 @Data
-public class VipguestInsertObject {
+public class VipguestsUpdateObject {
 
-    private String name;
+    private Integer id;
 
     private String conway;
 
-    private Integer balance;
-
+    private String name;
 }

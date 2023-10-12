@@ -4,43 +4,40 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-//@Data // 此注解自动生成getter和setter，toString，equals和hashCode等方法
 @NoArgsConstructor // 此注解生成无参构造函数
 @AllArgsConstructor // 此注解生成全参构造函数
-@TableName("vipguests")
-public class VipGuests {
+@TableName("pets")
+public class Pets {
 
     @TableId(value = "id", type = IdType.AUTO)
     @Getter
     @Setter
     private Integer id;
 
-    @TableField("name")
+    @TableField("petname")
     @Getter
     @Setter
-    private String name;
+    private String petname;
 
-    @TableField("balance")
-    @Getter
+    @TableField("owner")
     @Setter
-    private Integer balance;
+    @Getter
+    private String owner;
 
-    @TableField("conway")
-    @Getter
+    @TableField("age")
     @Setter
-    private String conway;
+    @Getter
+    private Integer age;
 
-    @TableField("lastshop")
-    @Getter
+    @TableField("variety")
     @Setter
-    private String lastshop;
-
-    @TableField("registertime")
     @Getter
-    @Setter
-    private String registertime;
+    private String variety;
 
     @TableField("is_delete")
     @Setter

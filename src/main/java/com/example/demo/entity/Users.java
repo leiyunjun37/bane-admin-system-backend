@@ -23,6 +23,7 @@ public class Users {
 
     @TableId(value = "id", type = IdType.AUTO)
     @Getter
+    @Setter
     private Integer id;
 
     @TableField("username")
@@ -42,10 +43,10 @@ public class Users {
     @TableField("lastlogin")
     @Setter
     @Getter
-    private String lastlogin = "0";
+    private String lastlogin;
 
     @TableField("is_delete")
     @Setter
-    private Integer is_delete = 0;
+    private Integer is_delete;
 
 }

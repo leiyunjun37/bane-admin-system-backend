@@ -39,4 +39,32 @@ public class VipGuestsServiceImpl extends ServiceImpl<VipGuestsMapper, VipGuests
         vipGuestsMapper.insert(vipGuests);
         return true;
     }
+
+    @Override
+    public Boolean checkUnqiue(String col, Object value){
+        QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.eq(col, value);
+        wrapper.eq("is_delete", 0);
+        VipGuests exist = vipGuestsMapper.selectOne(wrapper);
+        return exist == null;
+    }
+
+    @Override
+    public Boolean updateIsDelete(Integer id) {
+        VipGuests vipGuests = new VipGuests();
+        vipGuests.setId(id);
+        vipGuests.setIs_delete(1);
+        int rows = vipGuestsMapper.updateById(vipGuests);
+        return rows > 0;
+    }
+
+    @Override
+    public Boolean update(Integer id, String conway, String name) {
+        VipGuests vipGuests = new VipGuests();
+        vipGuests.setId(id);
+        vipGuests.setConway(conway);
+        vipGuests.setName(name);
+        int rows = vipGuestsMapper.updateById(vipGuests);
+        return rows > 0;
+    }
 }
