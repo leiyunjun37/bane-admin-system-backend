@@ -3,8 +3,8 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Users;
 import com.example.demo.service.IUsersService;
-import com.example.demo.utils.PageResult;
-import com.example.demo.utils.PageResultUtils;
+import com.example.demo.utils.PageDataResult;
+import com.example.demo.utils.PageDataResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,13 +26,13 @@ public class UsersController {
     private IUsersService usersService;
 
     @GetMapping("/get")
-    public PageResult select(@RequestParam("page") Integer page,
-                             @RequestParam("username") String username,
-                             @RequestParam("management") String management,
-                             @RequestParam("size") Integer size) {
+    public PageDataResult select(@RequestParam("page") Integer page,
+                                 @RequestParam("username") String username,
+                                 @RequestParam("management") String management,
+                                 @RequestParam("size") Integer size) {
         Integer start = (page - 1) * size + 1;
         List<Users> users = usersService.getUsers(username, management, start, size);
-        PageResult result = PageResultUtils.success(users);
+        PageDataResult result = PageDataResultUtils.success(users);
         result.setMessage("select success");
         return result;
     }

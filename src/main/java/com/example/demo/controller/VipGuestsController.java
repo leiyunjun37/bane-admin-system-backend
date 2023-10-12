@@ -2,8 +2,10 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.VipGuests;
 import com.example.demo.service.IVipGuestsService;
-import com.example.demo.utils.PageResult;
-import com.example.demo.utils.PageResultUtils;
+import com.example.demo.utils.PageDataResult;
+import com.example.demo.utils.PageDataResultUtils;
+import com.example.demo.utils.PageNoneDataResult;
+import com.example.demo.utils.PageNoneDataResultUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.example.demo.utils.RequestBody.Vipguests.VipguestInsertObject;
@@ -20,27 +22,27 @@ public class VipGuestsController {
     private IVipGuestsService vipGuestsService;
 
     @GetMapping("/get")
-    public PageResult select(@RequestParam("page") Integer page,
-                             @RequestParam("name") String name,
-                             @RequestParam("registertime") String registertime,
-                             @RequestParam("size") Integer size) {
+    public PageDataResult select(@RequestParam("page") Integer page,
+                                 @RequestParam("name") String name,
+                                 @RequestParam("registertime") String registertime,
+                                 @RequestParam("size") Integer size) {
         Integer start = (page - 1) * size + 1;
         List<VipGuests> vipGuests = vipGuestsService.getVipGuests(name, registertime, start, size);
-        PageResult result = PageResultUtils.success(vipGuests);
+        PageDataResult result = PageDataResultUtils.success(vipGuests);
         result.setMessage("select success");
         return result;
     }
 
     @PostMapping("/post")
-    public PageResult insert(@RequestBody VipguestInsertObject requestBody) {
+    public PageNoneDataResult insert(@RequestBody VipguestInsertObject requestBody) {
         String name = requestBody.getName();
         String conway = requestBody.getConway();
         Integer balance = requestBody.getBalance();
         LocalDate currentDate = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String registertime = currentDate.format(formatter);
-        Boolean insert = vipGuestsService.insertVipGuests(name, registertime, conway, balance);
-        PageResult result = PageResultUtils.success(insert);
+        vipGuestsService.insertVipGuests(name, registertime, conway, balance);
+        PageNoneDataResult result = PageNoneDataResultUtils.success();
         result.setMessage("insert success");
         return result;
     }
