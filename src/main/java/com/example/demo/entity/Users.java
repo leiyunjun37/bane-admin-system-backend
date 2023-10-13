@@ -35,6 +35,11 @@ public class Users {
     @Setter
     private String password;
 
+    @TableField("encryptedpassword")
+    @Getter
+    @Setter
+    private String encryptedpassword;
+
     @TableField("management")
     @Setter
     @Getter
