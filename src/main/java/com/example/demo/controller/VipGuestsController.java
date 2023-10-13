@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.VipGuests;
+import com.example.demo.service.IPetsService;
 import com.example.demo.service.IVipGuestsService;
 import com.example.demo.utils.PageDataResult;
 import com.example.demo.utils.PageDataResultUtils;
@@ -22,6 +23,9 @@ public class VipGuestsController {
     @Autowired
     private IVipGuestsService vipGuestsService;
 
+    @Autowired
+    private IPetsService petsService;
+
     @GetMapping("/get")
     public PageDataResult<Object> select(@RequestParam("page") Integer page,
                                  @RequestParam("name") String name,
@@ -41,6 +45,11 @@ public class VipGuestsController {
         String conway = requestBody.getConway();
         String conwayCol = "conway";
         if (vipGuestsService.checkUnqiue(nameCol, name) && vipGuestsService.checkUnqiue(conwayCol, conway)) {
+            String petnames = requestBody.getPets();
+            String[] pets = petnames.split(" ");
+            for (String pet : pets) {
+                petsService.insertPets(pet, name);
+            }
             Integer balance = requestBody.getBalance();
             LocalDate currentDate = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

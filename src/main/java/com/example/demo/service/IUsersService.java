@@ -17,4 +17,6 @@ public interface IUsersService extends IService<Users> {
 
     List<Users> getUsers(String username, String management, Integer start, Integer size);
 
+    Boolean checkPassowrd(String username, String password);
+
 }

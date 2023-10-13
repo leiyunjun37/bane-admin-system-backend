@@ -11,4 +11,6 @@ public class VipguestInsertObject {
 
     private Integer balance;
 
+    private String pets;
+
 }

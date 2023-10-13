@@ -5,7 +5,9 @@ import com.example.demo.entity.Pets;
 import com.example.demo.mapper.PetsMapper;
 import com.example.demo.service.IPetsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PetsServiceImpl extends ServiceImpl<PetsMapper, Pets> implements IPetsService {
 
     @Autowired

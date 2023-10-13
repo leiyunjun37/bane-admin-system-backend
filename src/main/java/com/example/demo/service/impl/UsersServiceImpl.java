@@ -35,4 +35,14 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         return usersMapper.selectPage(page, wrapper).getRecords();
     }
 
+    @Override
+    public Boolean checkPassowrd(String username, String password) {
+        QueryWrapper<Users> wrapper = new QueryWrapper<>();
+        wrapper.eq("username", username);
+        wrapper.eq("password", password);
+        wrapper.eq("is_delete", 0);
+        Users user = usersMapper.selectOne(wrapper);
+        return user != null;
+    }
+
 }
