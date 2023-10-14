@@ -3,11 +3,11 @@ package com.example.demo.utils.RequestBody.Users;
 import lombok.Data;
 
 @Data
-public class UsersInsertObject {
+public class UsersUpdateObject {
 
-    private String username;
+    private Integer id;
 
-    private String password;
+    private String name;
 
     private String management;
 }

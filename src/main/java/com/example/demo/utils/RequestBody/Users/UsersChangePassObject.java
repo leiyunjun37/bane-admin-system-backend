@@ -3,11 +3,9 @@ package com.example.demo.utils.RequestBody.Users;
 import lombok.Data;
 
 @Data
-public class UsersInsertObject {
+public class UsersChangePassObject {
 
-    private String username;
+    private Integer id;
 
     private String password;
-
-    private String management;
 }

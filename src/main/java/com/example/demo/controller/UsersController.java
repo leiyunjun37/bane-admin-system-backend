@@ -4,16 +4,10 @@ package com.example.demo.controller;
 import com.example.demo.entity.Users;
 import com.example.demo.service.IUsersService;
 import com.example.demo.utils.*;
-import com.example.demo.utils.RequestBody.Users.PageLoginResultUtils;
-import com.example.demo.utils.RequestBody.Users.PageLoginResult;
-import com.example.demo.utils.RequestBody.Users.UsersInsertObject;
-import com.example.demo.utils.RequestBody.Users.UsersLoginObject;
+import com.example.demo.utils.RequestBody.Users.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.time.LocalDateTime;
@@ -76,13 +70,13 @@ public class UsersController {
     }
 
     @PostMapping("/post")
-    public PageNoneDataResult<Object> insert(@RequestBody UsersInsertObject requestBody) throws Exception {
+    public PageNoneDataResult<Object> insert(@RequestBody UsersInsertObject requestBody) {
         String username = requestBody.getUsername();
         if (usersService.checkUsernameUnique(username)) {
             String password = requestBody.getPassword();
             if (usersService.checkPasswordInvalid(password)) {
                 String md5Password = commonUtils.md5(password);
-                String management = requestBody.getManagemeent();
+                String management = requestBody.getManagement();
                 usersService.insertUsers(username, password, management, md5Password);
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
                 result.setMessage("insert success");
@@ -111,4 +105,52 @@ public class UsersController {
             return result;
         }
     }
+
+    @PatchMapping("/changePassword")
+    public PageNoneDataResult<Object> changePassword(@RequestBody UsersChangePassObject requestBody) {
+        String newPassword = requestBody.getPassword();
+        if (usersService.checkPasswordInvalid(newPassword)) {
+            Integer id = requestBody.getId();
+            String[] cols = new String[]{"id", "password"};
+            Object[] values = new Object[]{id, newPassword};
+            if (usersService.update(cols, values)) {
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+                result.setMessage("change password success");
+                return result;
+            } else {
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
+                result.setMessage("change password failed, miss ness params");
+                return result;
+            }
+        } else {
+            PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
+            result.setMessage("the invalid password");
+            return result;
+        }
+    }
+
+    @PatchMapping("/patch")
+    public PageNoneDataResult<Object> update(@RequestBody UsersUpdateObject requestBody) {
+        String username = requestBody.getName();
+        if (usersService.checkUsernameUnique(username)) {
+            Integer id = requestBody.getId();
+            String management = requestBody.getManagement();
+            String[] cols = new String[]{"id", "username", "management"};
+            Object[] values = new Object[]{id, username, management};
+            if (usersService.update(cols, values)) {
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+                result.setMessage("update success");
+                return result;
+            } else {
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
+                result.setMessage("update failed, miss ness params");
+                return result;
+            }
+        } else {
+            PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
+            result.setMessage("the name already exist");
+            return result;
+        }
+    }
+
 }

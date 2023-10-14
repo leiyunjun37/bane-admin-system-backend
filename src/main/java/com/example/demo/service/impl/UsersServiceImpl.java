@@ -10,6 +10,7 @@ import com.example.demo.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -109,6 +110,29 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         }
         String regex = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^0-9a-zA-Z])(?=\\S+$).{8,16}$";
         return password.matches(regex);
+    }
+
+    @Override
+    public Boolean update(String[] cols, Object[] values) {
+        if (Arrays.asList(cols).contains("id")){
+            QueryWrapper<Users> wrapper = new QueryWrapper<>();
+            Users users = new Users();
+            for (int i = 0; i < cols.length; i++) {
+                if (cols[i].equals("id")) {
+                    users.setId((Integer) values[i]);
+                } else if (cols[i].equals("password")) {
+                    String password = (String) values[i];
+                    wrapper.eq("password", password)
+                            .eq("encryptedpassword", commonUtils.md5(password));
+                } else {
+                    wrapper.eq(cols[i], values[i]);
+                }
+            }
+            usersMapper.update(users, wrapper);
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

@@ -21,7 +21,7 @@ public class CommonUtils {
             while (hashtext.length() < 32) {
                 hashtext = "0" + hashtext;
             }
-            return hashtext;
+            return hashtext.toLowerCase();
         }
         catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
