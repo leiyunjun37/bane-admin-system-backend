@@ -17,4 +17,6 @@ public interface IPetServeService extends IService<PetServe> {
 
     void update(Integer id, String serveName, Integer price, String unit, String comment);
 
+    Integer countPetServe();
+
 }

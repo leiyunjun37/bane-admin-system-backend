@@ -64,4 +64,11 @@ public class PetServeServiceImpl extends ServiceImpl<PetServeMapper, PetServe> i
         petServe.setPrice(price);
         petServeMapper.updateById(petServe);
     }
+
+    @Override
+    public Integer countPetServe() {
+        QueryWrapper<PetServe> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return petServeMapper.selectCount(wrapper);
+    }
 }

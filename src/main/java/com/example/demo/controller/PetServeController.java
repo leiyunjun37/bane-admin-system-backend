@@ -28,7 +28,8 @@ public class PetServeController {
         try {
             Integer start = (page - 1) * size;
             List<PetServe> petServes = petServeService.select(serveName, start, size);
-            PageDataResult<Object> result = PageDataResultUtils.success(petServes);
+            Integer total = petServeService.countPetServe();
+            PageDataResult<Object> result = PageDataResultUtils.success(petServes, total);
             result.setMessage("select success");
             return result;
         } catch (Exception e) {

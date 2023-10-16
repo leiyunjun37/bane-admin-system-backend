@@ -65,4 +65,11 @@ public class ProductsServiceImpl extends ServiceImpl<ProductsMapper, Products> i
         products.setName(name);
         productsMapper.updateById(products);
     }
+
+    @Override
+    public Integer countProducts() {
+        QueryWrapper<Products> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return productsMapper.selectCount(wrapper);
+    }
 }

@@ -11,7 +11,7 @@
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 12/10/2023 10:31:56
+ Date: 16/10/2023 18:12:47
 */
 
 SET NAMES utf8mb4;
@@ -316,7 +316,26 @@ INSERT INTO `pets` VALUES (6, 'csdelete', 'vip888', 2, '123', 0);
 INSERT INTO `pets` VALUES (7, '123', 'vip666', 1, '123333', 0);
 INSERT INTO `pets` VALUES (8, 'eeeeee', 'vip666', 4, '1222222', 1);
 INSERT INTO `pets` VALUES (9, 'fffffff', 'vip777', 4, '1232233333', 1);
-INSERT INTO `pets` VALUES (10, '1231', 'cscscsc', 1, '-', 0);
+INSERT INTO `pets` VALUES (10, '1231', 'cscscsc', 1, '-', 1);
+INSERT INTO `pets` VALUES (11, 'jdkww', 'vip9', 6, '1231312', 0);
+
+-- ----------------------------
+-- Table structure for petserve
+-- ----------------------------
+DROP TABLE IF EXISTS `petserve`;
+CREATE TABLE `petserve`  (
+  `id` int(255) NOT NULL,
+  `serveName` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `price` int(255) NOT NULL,
+  `unit` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `comment` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `is_delete` int(1) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of petserve
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for products
@@ -335,7 +354,8 @@ CREATE TABLE `products`  (
 -- ----------------------------
 -- Records of products
 -- ----------------------------
-INSERT INTO `products` VALUES (1, 'cs', 60, 10, 'cscscs', 0);
+INSERT INTO `products` VALUES (1, 'cscscscs', 111, 31, '121121', 0);
+INSERT INTO `products` VALUES (2, 'cscscs', 123, 10, '12312312312', 1);
 
 -- ----------------------------
 -- Table structure for users
@@ -346,16 +366,9 @@ CREATE TABLE `users`  (
   `username` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `password` varchar(16) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `management` varchar(5) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `lastlogin` datetime(6) NOT NULL,
+  `lastlogin` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `is_delete` int(11) NOT NULL,
-  `date_joined` datetime(6) NOT NULL,
-  `email` varchar(254) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `first_name` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `is_active` tinyint(1) NOT NULL,
-  `is_staff` tinyint(1) NOT NULL,
-  `is_superuser` tinyint(1) NOT NULL,
-  `last_login` datetime(6) NULL DEFAULT NULL,
-  `last_name` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `encryptedpassword` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `users_username_e8658fc8_uniq`(`username`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
@@ -363,9 +376,11 @@ CREATE TABLE `users`  (
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES (3, 'admin', '123456', '管理员', '2023-08-29 08:24:34.399744', 0, '2023-10-07 03:57:02.946513', '', '', 1, 0, 0, NULL, '');
-INSERT INTO `users` VALUES (4, 'lyj', '123456', '普通用户', '2023-08-29 09:33:27.412310', 0, '2023-10-07 03:57:02.946513', '', '', 1, 0, 0, NULL, '');
-INSERT INTO `users` VALUES (5, 'yjlei', '123456', '管理员', '2023-08-29 09:35:50.682418', 1, '2023-10-07 03:57:02.946513', '', '', 1, 0, 0, NULL, '');
+INSERT INTO `users` VALUES (3, 'admin', '123456', '管理员', '2023-08-29 08:24:34.399744', 0, 'e10adc3949ba59abbe56e057f20f883e');
+INSERT INTO `users` VALUES (4, 'lyj', '123456', '普通用户', '2023-08-29 09:33:27.412310', 0, 'e10adc3949ba59abbe56e057f20f883e');
+INSERT INTO `users` VALUES (5, 'yjlei', 'admin@111222', '管理员', '2023-08-29 09:35:50.682418', 1, '13c71fb7a09090401b5c26d8ebc7d676');
+INSERT INTO `users` VALUES (6, 'springcs', 'admin@123', '管理员', '-', 0, 'e6e061838856bf47e1de730719fb2609');
+INSERT INTO `users` VALUES (7, 'plus', 'adminmmmm@111', '管理员', '-', 0, '144335f69a1712d3c25c6134f549dbcf');
 
 -- ----------------------------
 -- Table structure for users_groups
@@ -380,7 +395,7 @@ CREATE TABLE `users_groups`  (
   INDEX `users_groups_group_id_2f3517aa_fk_auth_group_id`(`group_id`) USING BTREE,
   CONSTRAINT `users_groups_group_id_2f3517aa_fk_auth_group_id` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `users_groups_userinfo_id_1a6144c7_fk_users_id` FOREIGN KEY (`userinfo_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of users_groups
@@ -399,7 +414,7 @@ CREATE TABLE `users_user_permissions`  (
   INDEX `users_user_permissio_permission_id_6d08dcd2_fk_auth_perm`(`permission_id`) USING BTREE,
   CONSTRAINT `users_user_permissio_permission_id_6d08dcd2_fk_auth_perm` FOREIGN KEY (`permission_id`) REFERENCES `auth_permission` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `users_user_permissions_userinfo_id_0ad2cdda_fk_users_id` FOREIGN KEY (`userinfo_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of users_user_permissions
@@ -418,7 +433,7 @@ CREATE TABLE `vipguests`  (
   `registertime` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `is_delete` int(11) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of vipguests
@@ -439,8 +454,9 @@ INSERT INTO `vipguests` VALUES (13, 'vip666', 150, '微信:12321312', '-', '2023
 INSERT INTO `vipguests` VALUES (14, 'vip777', 150, '微信:23131', '-', '2023-09-29', 0);
 INSERT INTO `vipguests` VALUES (15, 'vip888', 150, '微信:dsam89823', '-', '2023-09-29', 0);
 INSERT INTO `vipguests` VALUES (16, '777', 0, '微信:234234', '-', '2023-10-02', 1);
-INSERT INTO `vipguests` VALUES (17, 'cece', 999, '微信:1231231231', '-', '2023-10-07', 1);
+INSERT INTO `vipguests` VALUES (17, 'cece', 999, '微信:1231231231', '-', '-', 1);
 INSERT INTO `vipguests` VALUES (18, 'cscscsc', 123, '微信:1312312312', '-', '2023-10-08', 0);
 INSERT INTO `vipguests` VALUES (19, 'springcs', 150, '微信:666666', '-', '2023-10-11', 0);
+INSERT INTO `vipguests` VALUES (20, 'newcersioncs', 150, '微信：123456', '-', '-', 1);
 
 SET FOREIGN_KEY_CHECKS = 1;

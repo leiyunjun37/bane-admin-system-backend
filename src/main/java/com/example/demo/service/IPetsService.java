@@ -17,4 +17,9 @@ public interface IPetsService extends IService<Pets> {
     Boolean checkPetnameOwnerUnique(String owner, String petname, String variety);
 
     void delete(Integer id);
+
+    Integer countPets();
+
+    void deleteThroughGuest(String owner);
+
 }

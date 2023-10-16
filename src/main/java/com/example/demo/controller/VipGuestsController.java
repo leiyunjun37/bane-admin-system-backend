@@ -33,7 +33,8 @@ public class VipGuestsController {
                                  @RequestParam("size") Integer size) {
         Integer start = (page - 1) * size + 1;
         List<VipGuests> vipGuests = vipGuestsService.getVipGuests(name, registertime, start, size);
-        PageDataResult<Object> result = PageDataResultUtils.success(vipGuests);
+        Integer total = vipGuestsService.countVipGuest();
+        PageDataResult<Object> result = PageDataResultUtils.success(vipGuests, total);
         result.setMessage("select success");
         return result;
     }
@@ -67,7 +68,8 @@ public class VipGuestsController {
 
     @DeleteMapping("/delete")
     public PageNoneDataResult<Object> delete(@RequestParam("id") Integer id) {
-        vipGuestsService.updateIsDelete(id);
+        String owner = vipGuestsService.updateIsDelete(id);
+        petsService.deleteThroughGuest(owner);
         PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
         result.setMessage("delete success");
         return result;

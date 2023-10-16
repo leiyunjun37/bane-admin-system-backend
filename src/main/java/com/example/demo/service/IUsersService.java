@@ -29,6 +29,10 @@ public interface IUsersService extends IService<Users> {
 
     Boolean checkPasswordInvalid(String password);
 
-    Boolean update(String[] cols, Object[] values);
+    void update(String username, String management, Integer id);
+
+    Integer countUser();
+
+    void changePassword(String password, Integer id);
 
 }

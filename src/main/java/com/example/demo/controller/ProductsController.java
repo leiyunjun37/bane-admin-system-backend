@@ -27,7 +27,8 @@ public class ProductsController {
                                  @RequestParam("size") Integer size) {
         Integer start = (page - 1) * size;
         List<Products> products = productsService.select(name, price, start, size);
-        PageDataResult<Object> result = PageDataResultUtils.success(products);
+        Integer total = productsService.countProducts();
+        PageDataResult<Object> result = PageDataResultUtils.success(products, total);
         result.setMessage("select success");
         return result;
     }

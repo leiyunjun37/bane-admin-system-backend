@@ -88,19 +88,11 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
 
     @Override
     public Boolean delete(Integer id) {
-        QueryWrapper<Users> wrapper = new QueryWrapper<>();
-        wrapper.eq("id", id);
-        if (usersMapper.selectOne(wrapper) != null) {
-            Users users = new Users();
-            users.setId(id);
-            QueryWrapper<Users> wrapperr = new QueryWrapper<>();
-            wrapper.eq("id", id)
-                    .eq("is_delete", 1);
-            usersMapper.update(users, wrapperr);
-            return true;
-        } else {
-            return false;
-        }
+        Users users = new Users();
+        users.setId(id);
+        users.setIs_delete(1);
+        usersMapper.updateById(users);
+        return true;
     }
 
     @Override
@@ -113,26 +105,27 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     @Override
-    public Boolean update(String[] cols, Object[] values) {
-        if (Arrays.asList(cols).contains("id")){
-            QueryWrapper<Users> wrapper = new QueryWrapper<>();
-            Users users = new Users();
-            for (int i = 0; i < cols.length; i++) {
-                if (cols[i].equals("id")) {
-                    users.setId((Integer) values[i]);
-                } else if (cols[i].equals("password")) {
-                    String password = (String) values[i];
-                    wrapper.eq("password", password)
-                            .eq("encryptedpassword", commonUtils.md5(password));
-                } else {
-                    wrapper.eq(cols[i], values[i]);
-                }
-            }
-            usersMapper.update(users, wrapper);
-            return true;
-        } else {
-            return false;
-        }
+    public void update(String username, String management, Integer id) {
+        Users users = new Users();
+        users.setId(id);
+        users.setUsername(username);
+        users.setManagement(management);
+    }
+
+    @Override
+    public Integer countUser() {
+        QueryWrapper<Users> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return usersMapper.selectCount(wrapper);
+    }
+
+    @Override
+    public void changePassword(String password, Integer id) {
+        Users users = new Users();
+        users.setId(id);
+        users.setPassword(password);
+        users.setEncryptedpassword(commonUtils.md5(password));
+        usersMapper.updateById(users);
     }
 
 }

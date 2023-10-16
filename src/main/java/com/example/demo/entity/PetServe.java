@@ -42,4 +42,5 @@ public class PetServe {
     @TableField("is_delete")
     @Setter
     private Integer is_delete;
+
 }

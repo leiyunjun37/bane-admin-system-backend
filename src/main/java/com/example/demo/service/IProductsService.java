@@ -16,4 +16,6 @@ public interface IProductsService extends IService<Products> {
     void delete(Integer id);
 
     void update(Integer id, String name, Integer price, Integer inventory, String comment);
+
+    Integer countProducts();
 }

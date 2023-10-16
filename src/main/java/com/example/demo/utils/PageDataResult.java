@@ -11,5 +11,7 @@ public class PageDataResult<T> {
 
     private T data;
 
+    private Integer total;
+
     private String message;
 }

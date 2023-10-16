@@ -7,7 +7,7 @@ public class UsersUpdateObject {
 
     private Integer id;
 
-    private String name;
+    private String username;
 
     private String management;
 }

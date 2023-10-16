@@ -50,12 +50,16 @@ public class VipGuestsServiceImpl extends ServiceImpl<VipGuestsMapper, VipGuests
     }
 
     @Override
-    public Boolean updateIsDelete(Integer id) {
-        VipGuests vipGuests = new VipGuests();
+    public String updateIsDelete(Integer id) {
+        QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", id);
+        VipGuests vipGuests = vipGuestsMapper.selectOne(wrapper);
+        String owner = vipGuests.getName();
+        VipGuests vipGuest = new VipGuests();
         vipGuests.setId(id);
         vipGuests.setIs_delete(1);
-        int rows = vipGuestsMapper.updateById(vipGuests);
-        return rows > 0;
+        vipGuestsMapper.updateById(vipGuest);
+        return owner;
     }
 
     @Override
@@ -66,5 +70,12 @@ public class VipGuestsServiceImpl extends ServiceImpl<VipGuestsMapper, VipGuests
         vipGuests.setName(name);
         int rows = vipGuestsMapper.updateById(vipGuests);
         return rows > 0;
+    }
+
+    @Override
+    public Integer countVipGuest() {
+        QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return vipGuestsMapper.selectCount(wrapper);
     }
 }

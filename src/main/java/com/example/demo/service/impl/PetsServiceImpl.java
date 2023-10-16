@@ -70,4 +70,20 @@ public class PetsServiceImpl extends ServiceImpl<PetsMapper, Pets> implements IP
         pets.setIs_delete(1);
         petsMapper.updateById(pets);
     }
+
+    @Override
+    public Integer countPets() {
+        QueryWrapper<Pets> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return petsMapper.selectCount(wrapper);
+    }
+
+    @Override
+    public void deleteThroughGuest(String owner) {
+        Pets pets = new Pets();
+        pets.setIs_delete(1);
+        QueryWrapper<Pets> wrapper = new QueryWrapper<>();
+        wrapper.eq("owner", owner);
+        petsMapper.update(pets, wrapper);
+    }
 }

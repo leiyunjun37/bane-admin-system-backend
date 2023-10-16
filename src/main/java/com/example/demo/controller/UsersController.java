@@ -40,7 +40,8 @@ public class UsersController {
                                  @RequestParam("size") Integer size) {
         Integer start = (page - 1) * size + 1;
         List<Users> users = usersService.getUsers(username, management, start, size);
-        PageDataResult<Object> result = PageDataResultUtils.success(users);
+        Integer total = usersService.countUser();
+        PageDataResult<Object> result = PageDataResultUtils.success(users, total);
         result.setMessage("select success");
         return result;
     }
@@ -111,17 +112,10 @@ public class UsersController {
         String newPassword = requestBody.getPassword();
         if (usersService.checkPasswordInvalid(newPassword)) {
             Integer id = requestBody.getId();
-            String[] cols = new String[]{"id", "password"};
-            Object[] values = new Object[]{id, newPassword};
-            if (usersService.update(cols, values)) {
-                PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
-                result.setMessage("change password success");
-                return result;
-            } else {
-                PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
-                result.setMessage("change password failed, miss ness params");
-                return result;
-            }
+            usersService.changePassword(newPassword, id);
+            PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+            result.setMessage("change password success");
+            return result;
         } else {
             PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
             result.setMessage("the invalid password");
@@ -131,21 +125,15 @@ public class UsersController {
 
     @PatchMapping("/patch")
     public PageNoneDataResult<Object> update(@RequestBody UsersUpdateObject requestBody) {
-        String username = requestBody.getName();
+        String username = requestBody.getUsername();
+        System.out.println(username);
         if (usersService.checkUsernameUnique(username)) {
             Integer id = requestBody.getId();
             String management = requestBody.getManagement();
-            String[] cols = new String[]{"id", "username", "management"};
-            Object[] values = new Object[]{id, username, management};
-            if (usersService.update(cols, values)) {
-                PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
-                result.setMessage("update success");
-                return result;
-            } else {
-                PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
-                result.setMessage("update failed, miss ness params");
-                return result;
-            }
+            usersService.update(username, management, id);
+            PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+            result.setMessage("update success");
+            return result;
         } else {
             PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
             result.setMessage("the name already exist");

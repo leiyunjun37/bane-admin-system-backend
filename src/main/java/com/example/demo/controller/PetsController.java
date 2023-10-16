@@ -29,7 +29,8 @@ public class PetsController {
                                          @RequestParam("owner") String owner) {
         Integer start = (page - 1) * size + 1;
         List<Pets> pets = petsService.selectPets(start, size, petname, variety, owner, age);
-        PageDataResult<Object> result = PageDataResultUtils.success(pets);
+        Integer total = petsService.countPets();
+        PageDataResult<Object> result = PageDataResultUtils.success(pets, total);
         result.setMessage("select success");
         return result;
     }

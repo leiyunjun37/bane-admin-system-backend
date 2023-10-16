@@ -12,7 +12,9 @@ public interface IVipGuestsService extends IService<VipGuests> {
 
     Boolean checkUnqiue(String col, Object value);
 
-    Boolean updateIsDelete(Integer id);
+    String updateIsDelete(Integer id);
 
     Boolean update(Integer id, String conway, String name);
+
+    Integer countVipGuest();
 }
