@@ -48,7 +48,7 @@ public class VipGuestsController {
             String petnames = requestBody.getPets();
             String[] pets = petnames.split(" ");
             for (String pet : pets) {
-                petsService.insertPets(pet, name);
+                petsService.insertPets(pet, name, "-", 1);
             }
             Integer balance = requestBody.getBalance();
             LocalDate currentDate = LocalDate.now();
