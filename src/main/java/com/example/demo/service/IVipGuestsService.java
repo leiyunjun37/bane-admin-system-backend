@@ -17,4 +17,12 @@ public interface IVipGuestsService extends IService<VipGuests> {
     Boolean update(Integer id, String conway, String name);
 
     Integer countVipGuest();
+
+    Boolean checkBalance(String guestName, Integer endPrice);
+
+    void sell(String guestName, Integer endPrice);
+
+    void updateLastShop(String guestName, String lastShop);
+
+    void recharge(String guestName, Integer rechargeNum);
 }

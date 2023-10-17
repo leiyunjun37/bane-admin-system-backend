@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 
 import com.example.demo.entity.Users;
+import com.example.demo.service.ILoginLogService;
 import com.example.demo.service.IUsersService;
 import com.example.demo.utils.*;
 import com.example.demo.utils.RequestBody.Users.*;
@@ -26,6 +27,9 @@ public class UsersController {
 
     @Autowired
     private IUsersService usersService;
+
+    @Autowired
+    private ILoginLogService loginLogService;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
@@ -62,6 +66,7 @@ public class UsersController {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String lastlogin = now.format(formatter);
                 usersService.login(username, lastlogin);
+                loginLogService.insert(username, lastlogin);
                 PageLoginResult<Object> result = PageLoginResultUtils.success();
                 String token = jwtTokenUtil.generateToken(username);
                 result.setUsername(username);

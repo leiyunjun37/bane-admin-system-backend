@@ -78,4 +78,51 @@ public class VipGuestsServiceImpl extends ServiceImpl<VipGuestsMapper, VipGuests
         wrapper.eq("is_delete", 0);
         return vipGuestsMapper.selectCount(wrapper);
     }
+
+    @Override
+    public Boolean checkBalance(String guestName, Integer endPrice) {
+        QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.eq("name", guestName);
+        wrapper.eq("is_delete", 0);
+        VipGuests vipGuests = vipGuestsMapper.selectOne(wrapper);
+        Integer balance = vipGuests.getBalance();
+        if (balance >= endPrice) return true;
+        else return null;
+    }
+
+    @Override
+    public void sell(String guestName, Integer endPrice) {
+        QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.eq("name", guestName);
+        wrapper.eq("is_delete", 0);
+        VipGuests vipGuests = vipGuestsMapper.selectOne(wrapper);
+        Integer balance = vipGuests.getBalance();
+        Integer newBalance = balance - endPrice;
+        VipGuests newVipGuest = new VipGuests();
+        newVipGuest.setBalance(newBalance);
+        vipGuestsMapper.update(newVipGuest, wrapper);
+    }
+
+    @Override
+    public void updateLastShop(String guestName, String lastShop) {
+        QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.eq("name", guestName);
+        wrapper.eq("is_delete", 0);
+        VipGuests newVipGuest = new VipGuests();
+        newVipGuest.setLastshop(lastShop);
+        vipGuestsMapper.update(newVipGuest, wrapper);
+    }
+
+    @Override
+    public void recharge(String guestName, Integer rechargeNum) {
+        QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.eq("name", guestName);
+        wrapper.eq("is_delete", 0);
+        VipGuests vipGuests = vipGuestsMapper.selectOne(wrapper);
+        Integer balance = vipGuests.getBalance();
+        Integer newBalance = balance + rechargeNum;
+        VipGuests newVipGuest = new VipGuests();
+        newVipGuest.setBalance(newBalance);
+        vipGuestsMapper.update(newVipGuest, wrapper);
+    }
 }
