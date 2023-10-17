@@ -11,7 +11,7 @@
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 16/10/2023 18:12:47
+ Date: 17/10/2023 17:47:46
 */
 
 SET NAMES utf8mb4;
@@ -291,6 +291,42 @@ CREATE TABLE `django_session`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for loginlog
+-- ----------------------------
+DROP TABLE IF EXISTS `loginlog`;
+CREATE TABLE `loginlog`  (
+  `id` int(255) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `logintime` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `is_delete` int(1) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of loginlog
+-- ----------------------------
+INSERT INTO `loginlog` VALUES (1, 'lyj', '2023-10-17 17:35:50', 0);
+INSERT INTO `loginlog` VALUES (2, 'lyj', '2023-10-17 17:40:18', 0);
+
+-- ----------------------------
+-- Table structure for orderecord
+-- ----------------------------
+DROP TABLE IF EXISTS `orderecord`;
+CREATE TABLE `orderecord`  (
+  `id` int(255) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `is_vipguest` int(1) NOT NULL,
+  `comment` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `datetime` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `is_delete` int(1) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of orderecord
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for pets
 -- ----------------------------
 DROP TABLE IF EXISTS `pets`;
@@ -302,7 +338,7 @@ CREATE TABLE `pets`  (
   `variety` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `is_delete` int(11) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of pets
@@ -324,7 +360,7 @@ INSERT INTO `pets` VALUES (11, 'jdkww', 'vip9', 6, '1231312', 0);
 -- ----------------------------
 DROP TABLE IF EXISTS `petserve`;
 CREATE TABLE `petserve`  (
-  `id` int(255) NOT NULL,
+  `id` int(255) NOT NULL AUTO_INCREMENT,
   `serveName` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `price` int(255) NOT NULL,
   `unit` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
@@ -336,6 +372,8 @@ CREATE TABLE `petserve`  (
 -- ----------------------------
 -- Records of petserve
 -- ----------------------------
+INSERT INTO `petserve` VALUES (1, 'sssoosos', 12, '3333', '----', 1);
+INSERT INTO `petserve` VALUES (2, 'cscs', 40, '元/斤', '1313123123', 0);
 
 -- ----------------------------
 -- Table structure for products
@@ -349,7 +387,7 @@ CREATE TABLE `products`  (
   `comment` varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `is_delete` int(11) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of products
@@ -371,7 +409,7 @@ CREATE TABLE `users`  (
   `encryptedpassword` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `users_username_e8658fc8_uniq`(`username`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of users
@@ -395,7 +433,7 @@ CREATE TABLE `users_groups`  (
   INDEX `users_groups_group_id_2f3517aa_fk_auth_group_id`(`group_id`) USING BTREE,
   CONSTRAINT `users_groups_group_id_2f3517aa_fk_auth_group_id` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `users_groups_userinfo_id_1a6144c7_fk_users_id` FOREIGN KEY (`userinfo_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of users_groups
@@ -414,7 +452,7 @@ CREATE TABLE `users_user_permissions`  (
   INDEX `users_user_permissio_permission_id_6d08dcd2_fk_auth_perm`(`permission_id`) USING BTREE,
   CONSTRAINT `users_user_permissio_permission_id_6d08dcd2_fk_auth_perm` FOREIGN KEY (`permission_id`) REFERENCES `auth_permission` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `users_user_permissions_userinfo_id_0ad2cdda_fk_users_id` FOREIGN KEY (`userinfo_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of users_user_permissions
