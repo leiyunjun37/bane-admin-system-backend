@@ -25,55 +25,79 @@ public class ProductsController {
                                  @RequestParam("price") String price,
                                  @RequestParam("page") Integer page,
                                  @RequestParam("size") Integer size) {
-        Integer start = (page - 1) * size;
-        List<Products> products = productsService.select(name, price, start, size);
-        Integer total = productsService.countProducts();
-        PageDataResult<Object> result = PageDataResultUtils.success(products, total);
-        result.setMessage("select success");
-        return result;
+        try {
+            Integer start = (page - 1) * size;
+            List<Products> products = productsService.select(name, price, start, size);
+            Integer total = productsService.countProducts();
+            PageDataResult<Object> result = PageDataResultUtils.success(products, total);
+            result.setMessage("select success");
+            return result;
+        } catch (Exception e) {
+            PageDataResult<Object> result = PageDataResultUtils.fail();
+            result.setMessage(e.getMessage());
+            return result;
+        }
     }
 
     @PostMapping("/post")
     public PageNoneDataResult<Object> insert(@RequestBody ProductsInsertObject requestBody) {
-        String name = requestBody.getName();
-        if (productsService.checkNameUnique(name)) {
-            String comment =  requestBody.getComment();
-            Integer inventory = requestBody.getInventory();
-            Integer price = requestBody.getPrice();
-            productsService.insert(name, comment, price, inventory);
-            PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
-            result.setMessage("insert success");
-            return result;
-        } else {
+        try {
+            String name = requestBody.getName();
+            if (productsService.checkNameUnique(name)) {
+                String comment =  requestBody.getComment();
+                Integer inventory = requestBody.getInventory();
+                Integer price = requestBody.getPrice();
+                productsService.insert(name, comment, price, inventory);
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+                result.setMessage("insert success");
+                return result;
+            } else {
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
+                result.setMessage("insert failed, this name already exist");
+                return result;
+            }
+        } catch (Exception e) {
             PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
-            result.setMessage("insert failed, this name already exist");
+            result.setMessage(e.getMessage());
             return result;
         }
     }
 
     @DeleteMapping("/delete")
     public PageNoneDataResult<Object> delete(@RequestParam("id") Integer id) {
-        productsService.delete(id);
-        PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
-        result.setMessage("delete success");
-        return result;
+        try {
+            productsService.delete(id);
+            PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+            result.setMessage("delete success");
+            return result;
+        } catch (Exception e) {
+            PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
+            result.setMessage(e.getMessage());
+            return result;
+        }
     }
 
     @PatchMapping("/patch")
     public PageNoneDataResult<Object> update(@RequestBody ProductsUpdateObject requestBody) {
-        String name = requestBody.getName();
-        if (productsService.checkNameUnique(name)) {
-            Integer id = requestBody.getId();
-            Integer price = requestBody.getPrice();
-            Integer inventory = requestBody.getInventory();
-            String comment = requestBody.getComment();
-            productsService.update(id, name, price, inventory, comment);
-            PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
-            result.setMessage("udpate success");
-            return result;
-        } else {
+        try {
+            String name = requestBody.getName();
+            if (productsService.checkNameUnique(name)) {
+                Integer id = requestBody.getId();
+                Integer price = requestBody.getPrice();
+                Integer inventory = requestBody.getInventory();
+                String comment = requestBody.getComment();
+                productsService.update(id, name, price, inventory, comment);
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+                result.setMessage("udpate success");
+                return result;
+            } else {
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
+                result.setMessage("update failded, this name already exist");
+                return result;
+            }
+        } catch (Exception e) {
             PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
-            result.setMessage("update failded, this name already exist");
+            result.setMessage(e.getMessage());
             return result;
         }
     }

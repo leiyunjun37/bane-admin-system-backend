@@ -31,65 +31,89 @@ public class VipGuestsController {
                                  @RequestParam("name") String name,
                                  @RequestParam("registertime") String registertime,
                                  @RequestParam("size") Integer size) {
-        Integer start = (page - 1) * size + 1;
-        List<VipGuests> vipGuests = vipGuestsService.getVipGuests(name, registertime, start, size);
-        Integer total = vipGuestsService.countVipGuest();
-        PageDataResult<Object> result = PageDataResultUtils.success(vipGuests, total);
-        result.setMessage("select success");
-        return result;
+        try {
+            Integer start = (page - 1) * size + 1;
+            List<VipGuests> vipGuests = vipGuestsService.getVipGuests(name, registertime, start, size);
+            Integer total = vipGuestsService.countVipGuest();
+            PageDataResult<Object> result = PageDataResultUtils.success(vipGuests, total);
+            result.setMessage("select success");
+            return result;
+        } catch (Exception e) {
+            PageDataResult<Object> result = PageDataResultUtils.fail();
+            result.setMessage(e.getMessage());
+            return result;
+        }
     }
 
     @PostMapping("/post")
     public PageNoneDataResult<Object> insert(@RequestBody VipguestInsertObject requestBody) {
-        String name = requestBody.getName();
-        String nameCol = "name";
-        String conway = requestBody.getConway();
-        String conwayCol = "conway";
-        if (vipGuestsService.checkUnqiue(nameCol, name) && vipGuestsService.checkUnqiue(conwayCol, conway)) {
-            String petnames = requestBody.getPets();
-            String[] pets = petnames.split(" ");
-            for (String pet : pets) {
-                petsService.insertPets(pet, name, "-", 1);
+        try {
+            String name = requestBody.getName();
+            String nameCol = "name";
+            String conway = requestBody.getConway();
+            String conwayCol = "conway";
+            if (vipGuestsService.checkUnqiue(nameCol, name) && vipGuestsService.checkUnqiue(conwayCol, conway)) {
+                String petnames = requestBody.getPets();
+                String[] pets = petnames.split(" ");
+                for (String pet : pets) {
+                    petsService.insertPets(pet, name, "-", 1);
+                }
+                Integer balance = requestBody.getBalance();
+                LocalDate currentDate = LocalDate.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String registertime = currentDate.format(formatter);
+                vipGuestsService.insertVipGuests(name, registertime, conway, balance);
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+                result.setMessage("insert success");
+                return result;
+            } else {
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
+                result.setMessage("the name or conway already exist");
+                return result;
             }
-            Integer balance = requestBody.getBalance();
-            LocalDate currentDate = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String registertime = currentDate.format(formatter);
-            vipGuestsService.insertVipGuests(name, registertime, conway, balance);
-            PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
-            result.setMessage("insert success");
-            return result;
-        } else {
+        } catch (Exception e) {
             PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
-            result.setMessage("the name or conway already exist");
+            result.setMessage(e.getMessage());
             return result;
         }
     }
 
     @DeleteMapping("/delete")
     public PageNoneDataResult<Object> delete(@RequestParam("id") Integer id) {
-        String owner = vipGuestsService.updateIsDelete(id);
-        petsService.deleteThroughGuest(owner);
-        PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
-        result.setMessage("delete success");
-        return result;
+        try {
+            String owner = vipGuestsService.updateIsDelete(id);
+            petsService.deleteThroughGuest(owner);
+            PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+            result.setMessage("delete success");
+            return result;
+        } catch (Exception e) {
+            PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+            result.setMessage(e.getMessage());
+            return result;
+        }
     }
 
     @PatchMapping("/patch")
     public PageNoneDataResult<Object> update(@RequestBody VipguestsUpdateObject requestBody) {
-        String name = requestBody.getName();
-        String nameCol = "name";
-        String conway = requestBody.getConway();
-        String conwayCol = "conway";
-        if (vipGuestsService.checkUnqiue(nameCol, name) && vipGuestsService.checkUnqiue(conwayCol, conway)) {
-            Integer id = requestBody.getId();
-            vipGuestsService.update(id, conway, name);
-            PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
-            result.setMessage("insert success");
-            return result;
-        } else {
+        try {
+            String name = requestBody.getName();
+            String nameCol = "name";
+            String conway = requestBody.getConway();
+            String conwayCol = "conway";
+            if (vipGuestsService.checkUnqiue(nameCol, name) && vipGuestsService.checkUnqiue(conwayCol, conway)) {
+                Integer id = requestBody.getId();
+                vipGuestsService.update(id, conway, name);
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+                result.setMessage("insert success");
+                return result;
+            } else {
+                PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
+                result.setMessage("the name or conway already exist");
+                return result;
+            }
+        } catch (Exception e) {
             PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
-            result.setMessage("the name or conway already exist");
+            result.setMessage(e.getMessage());
             return result;
         }
     }

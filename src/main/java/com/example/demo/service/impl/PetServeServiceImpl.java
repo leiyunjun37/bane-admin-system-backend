@@ -29,7 +29,7 @@ public class PetServeServiceImpl extends ServiceImpl<PetServeMapper, PetServe> i
     @Override
     public Boolean checkServeNameUnique(String serveName) {
         QueryWrapper<PetServe> wrapper = new QueryWrapper<>();
-        wrapper.eq("name", serveName);
+        wrapper.eq("serveName", serveName);
         wrapper.eq("is_delete", 0);
         PetServe exist = petServeMapper.selectOne(wrapper);
         return exist == null;
