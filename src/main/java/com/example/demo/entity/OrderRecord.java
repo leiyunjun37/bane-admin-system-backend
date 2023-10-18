@@ -40,6 +40,11 @@ public class OrderRecord {
     @Setter
     private String comment;
 
+    @TableField("value")
+    @Getter
+    @Setter
+    private Integer value;
+
     @TableField("is_delete")
     @Setter
     private Integer is_delete;
