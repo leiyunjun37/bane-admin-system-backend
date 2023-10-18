@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.service.IOperationLogService;
 import com.example.demo.service.IOrderRecordService;
 import com.example.demo.service.IVipGuestsService;
+import com.example.demo.utils.JwtTokenUtil;
 import com.example.demo.utils.PageNoneDataResult;
 import com.example.demo.utils.PageNoneDataResultUtils;
 import com.example.demo.utils.RequestBody.Bane.RechargeObject;
@@ -10,6 +12,7 @@ import com.example.demo.utils.RequestBody.Bane.SellObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,8 +27,14 @@ public class BaneController {
     @Autowired
     private IOrderRecordService orderRecordService;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private IOperationLogService operationLogService;
+
     @PostMapping("/sellVip")
-    public PageNoneDataResult<Object> sellVip(@RequestBody SellObject requestBody) {
+    public PageNoneDataResult<Object> sellVip(@RequestBody SellObject requestBody, HttpServletRequest request) {
         try {
             String guestName = requestBody.getGuestName();
             Integer endPrice = requestBody.getEndPrice();
@@ -38,17 +47,21 @@ public class BaneController {
                 LocalDateTime now = LocalDateTime.now();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
                 String formattedDateTime = now.format(formatter);
-                String lastShop = String.format("于%s购买了价值%d的宠物商品以及享受了价值%d的宠物服务项目,享受%d折的会员折扣,总计扣费%d", formattedDateTime, productsPrice, petServePrice, discount, endPrice);
+                String lastShop = String.format("于%s购买了价值%d元的宠物商品以及享受了价值%d元的宠物服务项目,享受%d折的会员折扣,总计扣费%d元", formattedDateTime, productsPrice, petServePrice, discount, endPrice);
                 vipGuestsService.updateLastShop(guestName, lastShop);
-                StringBuilder base = new StringBuilder("购买了");
+                StringBuilder base = new StringBuilder("购买了宠物商品:");
                 for (String product : productNames) {
                     base.append(product).append(":");
                 }
                 String Base = base.toString();
-                String comment = String.format("于%s%s的宠物商品,价值%d以及享受了价值%d的宠物服务项目,享受%d折的会员折扣,总计扣费%d",formattedDateTime, Base, productsPrice, petServePrice,discount, endPrice);
+                String comment = String.format("于%s%s价值%d元以及享受了价值%d元的宠物服务项目,享受%d折的会员折扣,总计扣费%d元",formattedDateTime, Base, productsPrice, petServePrice,discount, endPrice);
                 orderRecordService.sellVip(guestName, formattedDateTime, comment);
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
                 result.setMessage("sell success");
+                String token = request.getHeader("Authorization").substring("Bearer ".length());
+                String username = jwtTokenUtil.getUsernameFromToken(token);
+                operationLogService.insert(username, "编辑", "会员信息", formattedDateTime);
+                operationLogService.insert(username, "会员消费", "会员消费", formattedDateTime);
                 return result;
             } else {
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
@@ -63,7 +76,7 @@ public class BaneController {
     }
 
     @PostMapping("/sellUnVip")
-    public PageNoneDataResult<Object> sellUnVip(@RequestBody SellObject requestBody) {
+    public PageNoneDataResult<Object> sellUnVip(@RequestBody SellObject requestBody, HttpServletRequest request) {
         try {
             Integer endPrice = requestBody.getEndPrice();
             List<String> productNames = requestBody.getProductNames();
@@ -73,15 +86,18 @@ public class BaneController {
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
             String formattedDateTime = now.format(formatter);
-            StringBuilder base = new StringBuilder("购买了");
+            StringBuilder base = new StringBuilder("购买了宠物商品:");
             for (String product : productNames) {
                 base.append(product).append(":");
             }
             String Base = base.toString();
-            String comment = String.format("于%s%s的宠物商品,价值%d以及享受了价值%d的宠物服务项目,享受%d折,总计消费%d",formattedDateTime, Base, productsPrice, petServePrice, discount, endPrice);
+            String comment = String.format("于%s%s价值%d元以及享受了价值%d元的宠物服务项目,享受%d折,总计消费%d元",formattedDateTime, Base, productsPrice, petServePrice, discount, endPrice);
             orderRecordService.sellUnVip(formattedDateTime, comment);
             PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
             result.setMessage("sell success");
+            String token = request.getHeader("Authorization").substring("Bearer ".length());
+            String username = jwtTokenUtil.getUsernameFromToken(token);
+            operationLogService.insert(username, "普通用户消费", "普通用户消费", formattedDateTime);
             return result;
         } catch (Exception e) {
             PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
@@ -91,7 +107,7 @@ public class BaneController {
     }
 
     @PostMapping("/recharge")
-    public PageNoneDataResult<Object> recharge(@RequestBody RechargeObject requestBody) {
+    public PageNoneDataResult<Object> recharge(@RequestBody RechargeObject requestBody, HttpServletRequest request) {
         try {
             String guestName = requestBody.getGuestName();
             Integer rechargeNum = requestBody.getRechargeNum();
@@ -102,7 +118,10 @@ public class BaneController {
             String comment = String.format("于%s充值%d元", formattedDateTime, rechargeNum);
             orderRecordService.recharge(guestName, formattedDateTime, comment);
             PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
-            result.setMessage("充值成功");
+            result.setMessage("recharge success");
+            String token = request.getHeader("Authorization").substring("Bearer ".length());
+            String username = jwtTokenUtil.getUsernameFromToken(token);
+            operationLogService.insert(username, "充值", "充值", formattedDateTime);
             return result;
         } catch (Exception e) {
             PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();

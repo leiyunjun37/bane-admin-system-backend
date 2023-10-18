@@ -22,4 +22,6 @@ public interface IPetsService extends IService<Pets> {
 
     void deleteThroughGuest(String owner);
 
+    void changeOwner(Integer ownerId, String newOwnerName);
+
 }

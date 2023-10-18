@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.demo.entity.Pets;
+import com.example.demo.entity.VipGuests;
 import com.example.demo.mapper.PetsMapper;
+import com.example.demo.mapper.VipGuestsMapper;
 import com.example.demo.service.IPetsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ public class PetsServiceImpl extends ServiceImpl<PetsMapper, Pets> implements IP
 
     @Autowired
     private PetsMapper petsMapper;
+
+    @Autowired
+    private VipGuestsMapper vipGuestsMapper;
 
     @Override
     public Boolean insertPets(String petname, String owner, String variety, Integer age) {
@@ -85,5 +90,19 @@ public class PetsServiceImpl extends ServiceImpl<PetsMapper, Pets> implements IP
         QueryWrapper<Pets> wrapper = new QueryWrapper<>();
         wrapper.eq("owner", owner);
         petsMapper.update(pets, wrapper);
+    }
+
+    @Override
+    public void changeOwner(Integer ownerId, String newOwnerName) {
+        QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", ownerId);
+        VipGuests vipGuests = vipGuestsMapper.selectOne(wrapper);
+        String oldOwnerName = vipGuests.getName();
+        Pets pets = new Pets();
+        pets.setOwner(newOwnerName);
+        QueryWrapper<Pets> wrapper1 = new QueryWrapper<>();
+        wrapper1.eq("owner", oldOwnerName);
+        wrapper1.eq("is_delete", 0);
+        petsMapper.update(pets, wrapper1);
     }
 }

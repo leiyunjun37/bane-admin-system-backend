@@ -3,12 +3,14 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Users;
 import com.example.demo.service.ILoginLogService;
+import com.example.demo.service.IOperationLogService;
 import com.example.demo.service.IUsersService;
 import com.example.demo.utils.*;
 import com.example.demo.utils.RequestBody.Users.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.time.LocalDateTime;
@@ -37,17 +39,30 @@ public class UsersController {
     @Autowired
     private CommonUtils commonUtils;
 
+    @Autowired
+    private IOperationLogService operationLogService;
+
+    public static String pageInfo = "用户信息";
+
     @GetMapping("/get")
     public PageDataResult<Object> select(@RequestParam("page") Integer page,
-                                 @RequestParam("username") String username,
-                                 @RequestParam("management") String management,
-                                 @RequestParam("size") Integer size) {
+                                         @RequestParam("username") String username,
+                                         @RequestParam("management") String management,
+                                         @RequestParam("size") Integer size,
+                                         HttpServletRequest request) {
         try {
             Integer start = (page - 1) * size + 1;
             List<Users> users = usersService.getUsers(username, management, start, size);
             Integer total = usersService.countUser();
             PageDataResult<Object> result = PageDataResultUtils.success(users, total);
             result.setMessage("select success");
+            String token = request.getHeader("Authorization").substring("Bearer ".length());
+            String name = jwtTokenUtil.getUsernameFromToken(token);
+            String type = "查询";
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+            String formattedDateTime = now.format(formatter);
+            operationLogService.insert(name, type, pageInfo, formattedDateTime);
             return result;
         } catch (Exception e) {
             PageDataResult<Object> result = PageDataResultUtils.fail();
@@ -91,7 +106,7 @@ public class UsersController {
     }
 
     @PostMapping("/post")
-    public PageNoneDataResult<Object> insert(@RequestBody UsersInsertObject requestBody) {
+    public PageNoneDataResult<Object> insert(@RequestBody UsersInsertObject requestBody, HttpServletRequest request) {
         try {
             String username = requestBody.getUsername();
             if (usersService.checkUsernameUnique(username)) {
@@ -102,6 +117,13 @@ public class UsersController {
                     usersService.insertUsers(username, password, management, md5Password);
                     PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
                     result.setMessage("insert success");
+                    String token = request.getHeader("Authorization").substring("Bearer ".length());
+                    String name = jwtTokenUtil.getUsernameFromToken(token);
+                    String type = "新增";
+                    LocalDateTime now = LocalDateTime.now();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                    String formattedDateTime = now.format(formatter);
+                    operationLogService.insert(name, type, pageInfo, formattedDateTime);
                     return result;
                 } else {
                     PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
@@ -121,11 +143,18 @@ public class UsersController {
     }
 
     @DeleteMapping("/delete")
-    public PageNoneDataResult<Object> delete(@RequestParam("id") Integer id) {
+    public PageNoneDataResult<Object> delete(@RequestParam("id") Integer id, HttpServletRequest request) {
         try {
             if (usersService.delete(id)) {
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
                 result.setMessage("delete success");
+                String token = request.getHeader("Authorization").substring("Bearer ".length());
+                String username = jwtTokenUtil.getUsernameFromToken(token);
+                String type = "删除";
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                String formattedDateTime = now.format(formatter);
+                operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 return result;
             } else {
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
@@ -140,7 +169,7 @@ public class UsersController {
     }
 
     @PatchMapping("/changePassword")
-    public PageNoneDataResult<Object> changePassword(@RequestBody UsersChangePassObject requestBody) {
+    public PageNoneDataResult<Object> changePassword(@RequestBody UsersChangePassObject requestBody, HttpServletRequest request) {
         try {
             String newPassword = requestBody.getPassword();
             if (usersService.checkPasswordInvalid(newPassword)) {
@@ -148,6 +177,13 @@ public class UsersController {
                 usersService.changePassword(newPassword, id);
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
                 result.setMessage("change password success");
+                String token = request.getHeader("Authorization").substring("Bearer ".length());
+                String username = jwtTokenUtil.getUsernameFromToken(token);
+                String type = "修改密码";
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                String formattedDateTime = now.format(formatter);
+                operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 return result;
             } else {
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
@@ -162,7 +198,7 @@ public class UsersController {
     }
 
     @PatchMapping("/patch")
-    public PageNoneDataResult<Object> update(@RequestBody UsersUpdateObject requestBody) {
+    public PageNoneDataResult<Object> update(@RequestBody UsersUpdateObject requestBody, HttpServletRequest request) {
         try {
             String username = requestBody.getUsername();
             System.out.println(username);
@@ -172,6 +208,13 @@ public class UsersController {
                 usersService.update(username, management, id);
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
                 result.setMessage("update success");
+                String token = request.getHeader("Authorization").substring("Bearer ".length());
+                String name = jwtTokenUtil.getUsernameFromToken(token);
+                String type = "编辑";
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                String formattedDateTime = now.format(formatter);
+                operationLogService.insert(name, type, pageInfo, formattedDateTime);
                 return result;
             } else {
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
