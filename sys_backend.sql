@@ -11,7 +11,7 @@
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 17/10/2023 17:47:46
+ Date: 18/10/2023 16:52:07
 */
 
 SET NAMES utf8mb4;
@@ -307,6 +307,32 @@ CREATE TABLE `loginlog`  (
 -- ----------------------------
 INSERT INTO `loginlog` VALUES (1, 'lyj', '2023-10-17 17:35:50', 0);
 INSERT INTO `loginlog` VALUES (2, 'lyj', '2023-10-17 17:40:18', 0);
+INSERT INTO `loginlog` VALUES (3, 'lyj', '2023-10-17 18:20:02', 0);
+INSERT INTO `loginlog` VALUES (4, 'lyj', '2023-10-18 10:53:18', 0);
+INSERT INTO `loginlog` VALUES (5, 'lyj', '2023-10-18 15:19:18', 0);
+
+-- ----------------------------
+-- Table structure for operationlog
+-- ----------------------------
+DROP TABLE IF EXISTS `operationlog`;
+CREATE TABLE `operationlog`  (
+  `id` int(255) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `datetime` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `is_delete` int(1) NOT NULL,
+  `page` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of operationlog
+-- ----------------------------
+INSERT INTO `operationlog` VALUES (1, 'lyj', '充值', '20231018-11:47:08', 0, '充值');
+INSERT INTO `operationlog` VALUES (2, 'lyj', '编辑', '20231018-11:51:28', 0, '会员信息');
+INSERT INTO `operationlog` VALUES (3, 'lyj', '会员消费', '20231018-11:51:28', 0, '会员消费');
+INSERT INTO `operationlog` VALUES (4, 'lyj', '普通用户消费', '20231018-11:56:15', 0, '普通用户消费');
+INSERT INTO `operationlog` VALUES (5, 'lyj', '查询', '20231018-12:21:41', 0, '用户信息');
 
 -- ----------------------------
 -- Table structure for orderecord
@@ -319,12 +345,17 @@ CREATE TABLE `orderecord`  (
   `comment` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `datetime` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `is_delete` int(1) NOT NULL,
+  `value` int(255) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of orderecord
 -- ----------------------------
+INSERT INTO `orderecord` VALUES (1, 'vip1', 1, '于20231018-11:45:58充值50元', '2023-10-18 11:45:58', 0, 50);
+INSERT INTO `orderecord` VALUES (2, 'vip1', 1, '于20231018-11:47:08充值50元', '2023-10-18 11:47:08', 0, 50);
+INSERT INTO `orderecord` VALUES (3, 'vip1', 1, '于20231018-11:51:28购买了cs:cs1:cs2:的宠物商品,价值123以及享受了价值50的宠物服务项目,享受75折的会员折扣,总计扣费130', '2023-10-18 11:51:28', 0, 130);
+INSERT INTO `orderecord` VALUES (4, '普通用户', 0, '于20231018-11:56:15购买了cs:cs1:cs2:的宠物商品,价值123以及享受了价值50的宠物服务项目,享受75折,总计消费130', '2023-10-18 11:56:15', 0, 130);
 
 -- ----------------------------
 -- Table structure for pets
@@ -338,7 +369,7 @@ CREATE TABLE `pets`  (
   `variety` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `is_delete` int(11) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of pets
@@ -367,7 +398,7 @@ CREATE TABLE `petserve`  (
   `comment` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `is_delete` int(1) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of petserve
@@ -471,12 +502,12 @@ CREATE TABLE `vipguests`  (
   `registertime` varchar(128) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `is_delete` int(11) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of vipguests
 -- ----------------------------
-INSERT INTO `vipguests` VALUES (1, 'vip1', 230, '微信:1234567', '洗浴', '2023-08-09', 0);
+INSERT INTO `vipguests` VALUES (1, 'vip1', 200, '微信:1234567', '于20231018-11:51:28购买了价值123的宠物商品以及享受了价值50的宠物服务项目,享受75折的会员折扣,总计扣费130', '2023-08-09', 0);
 INSERT INTO `vipguests` VALUES (2, 'vip2', 111, '电话:123456', '6786', '2023-09-09', 0);
 INSERT INTO `vipguests` VALUES (3, 'vip3', 333, '微信:123123131', '3333', '2023-09-09', 0);
 INSERT INTO `vipguests` VALUES (4, 'vip4', 333, '3333333', '3333', '2023-09-09', 0);
