@@ -59,96 +59,52 @@ public class OrderRecordServiceImpl extends ServiceImpl<OrderRecordMapper, Order
 
     @Override
     public CountsReturnObject counts(Integer type) {
-        LocalDate currentDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate now = LocalDate.now();
+        CountsReturnObject countsReturnObject = new CountsReturnObject();
+        List<Integer> valueList = new ArrayList<>();
+        List<String> dateList = new ArrayList<>();
         if (type == 0) {
-            List<String> dateList = new ArrayList<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             for (int i = 0; i < 7; i++) {
-                String formattedDate = currentDate.minusDays(i).format(formatter);
+                String formattedDate = now.minusDays(i).format(formatter);
                 dateList.add(formattedDate);
-            }
-            CountsReturnObject countsReturnObject = new CountsReturnObject();
-            countsReturnObject.setDate(dateList);
-            List<Integer> valueList = new ArrayList<>();
-            for (String date : dateList) {
                 QueryWrapper<OrderRecord> wrapper = new QueryWrapper<>();
-                wrapper.like("datetime", date);
+                wrapper.like("datetime", formattedDate);
                 wrapper.like("is_delete", 0);
                 List<OrderRecord> orderRecords = orderRecordMapper.selectList(wrapper);
-                if (orderRecords.isEmpty()) {
-                    valueList.add(0);
-                } else {
-                    int sum = 0;
-                    for (OrderRecord orderRecord : orderRecords) {
-                        sum += orderRecord.getValue();
-                    }
-                    valueList.add(sum);
-                }
+                valueList.add(calculateValueList(orderRecords));
             }
-            countsReturnObject.setValue(valueList);
-            return countsReturnObject;
         } else if (type == 1) {
-            List<Integer> valueList = new ArrayList<>();
-            List<String> dateList = new ArrayList<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
             for (int i = 1; i <= 12; i++){
-                int year = LocalDate.now().getYear();
-                String month = "";
-                if (i < 10) {
-                    month = String.format("%d-0%d", year, i);
-                    dateList.add(month);
-                } else {
-                    month = String.format("%d-%d", year, i);
-                    dateList.add(month);
-                }
+                dateList.add(now.format(formatter));
                 QueryWrapper<OrderRecord> wrapper = new QueryWrapper<>();
-                wrapper.like("datetime", month);
+                wrapper.like("datetime", now.format(formatter));
                 wrapper.eq("is_delete", 0);
                 List<OrderRecord> orderRecords = orderRecordMapper.selectList(wrapper);
-                if (orderRecords.isEmpty()) {
-                    valueList.add(0);
-                } else {
-                    int sum = 0;
-                    for (OrderRecord orderRecord : orderRecords) {
-                        sum += orderRecord.getValue();
-                    }
-                    valueList.add(sum);
-                }
+                valueList.add(calculateValueList(orderRecords));
+                now = now.minusMonths(1);
             }
-            CountsReturnObject countsReturnObject = new CountsReturnObject();
-            countsReturnObject.setDate(dateList);
-            countsReturnObject.setValue(valueList);
-            return countsReturnObject;
         } else {
-            List<Integer> valueList = new ArrayList<>();
-            List<String> dateList = new ArrayList<>();
-            List<LocalDate> dates = new ArrayList<>();
-            for (int i = 0; i < 5; i++) {
-                dates.add(LocalDate.now().minus(Period.ofYears(i)));
-            }
             DateTimeFormatter formatter_year = DateTimeFormatter.ofPattern("yyyy");
-            for (LocalDate date : dates) {
-                String year = date.format(formatter_year);
+            for (int i = 0; i < 5; i++) {
+                String year = now.minus(Period.ofYears(i)).format(formatter_year);
                 dateList.add(year);
-            }
-            for (String date: dateList) {
                 QueryWrapper<OrderRecord> wrapper = new QueryWrapper<>();
-                wrapper.like("datetime", date);
+                wrapper.like("datetime", year);
                 wrapper.eq("is_delete", 0);
                 List<OrderRecord> orderRecords = orderRecordMapper.selectList(wrapper);
-                if (orderRecords.isEmpty()) {
-                    valueList.add(0);
-                } else {
-                    int sum = 0;
-                    for (OrderRecord orderRecord : orderRecords) {
-                        sum += orderRecord.getValue();
-                    }
-                    valueList.add(sum);
-                }
+                valueList.add(calculateValueList(orderRecords));
             }
-            CountsReturnObject countsReturnObject = new CountsReturnObject();
-            countsReturnObject.setDate(dateList);
-            countsReturnObject.setValue(valueList);
-            return countsReturnObject;
         }
+        countsReturnObject.setDate(dateList);
+        countsReturnObject.setValue(valueList);
+        return countsReturnObject;
+    }
+
+    private Integer calculateValueList(List<OrderRecord> orderRecords) {
+        return orderRecords.stream()
+                .mapToInt(OrderRecord::getValue)
+                .sum();
     }
 }
