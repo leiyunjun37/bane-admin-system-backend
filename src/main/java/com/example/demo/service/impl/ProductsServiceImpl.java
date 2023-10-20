@@ -9,6 +9,7 @@ import com.example.demo.service.IProductsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -18,13 +19,18 @@ public class ProductsServiceImpl extends ServiceImpl<ProductsMapper, Products> i
     private ProductsMapper productsMapper;
 
     @Override
-    public List<Products> select(String name, String price, Integer start, Integer size) {
+    public HashMap<String, Object> select(String name, String price, Integer start, Integer size) {
+        HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<Products> wrapper = new QueryWrapper<>();
         wrapper.like("name", name);
         wrapper.gt("price", price);
         wrapper.eq("is_delete", 0);
         Page<Products> page = new Page<>(start, size);
-        return productsMapper.selectPage(page, wrapper).getRecords();
+        List<Products> products = productsMapper.selectPage(page, wrapper).getRecords();
+        Integer total = productsMapper.selectCount(wrapper);
+        hashMap.put("data", products);
+        hashMap.put("total", total);
+        return hashMap;
     }
 
     @Override
@@ -71,5 +77,12 @@ public class ProductsServiceImpl extends ServiceImpl<ProductsMapper, Products> i
         QueryWrapper<Products> wrapper = new QueryWrapper<>();
         wrapper.eq("is_delete", 0);
         return productsMapper.selectCount(wrapper);
+    }
+
+    @Override
+    public List<Products> getAllProducts() {
+        QueryWrapper<Products> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return productsMapper.selectList(wrapper);
     }
 }

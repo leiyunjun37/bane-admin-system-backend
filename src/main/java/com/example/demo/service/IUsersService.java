@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.entity.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public interface IUsersService extends IService<Users> {
 
-    List<Users> getUsers(String username, String management, Integer start, Integer size);
+    HashMap<String, Object> getUsers(String username, String management, Integer start, Integer size);
 
     void insertUsers(String username, String password, String management, String encryptedpassword);
 
@@ -34,5 +35,7 @@ public interface IUsersService extends IService<Users> {
     Integer countUser();
 
     void changePassword(String password, Integer id);
+
+    List<Users> getAllUsers();
 
 }

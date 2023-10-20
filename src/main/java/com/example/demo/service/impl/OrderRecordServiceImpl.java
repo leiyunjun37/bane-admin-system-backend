@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.demo.entity.OrderRecord;
 import com.example.demo.mapper.OrderRecordMapper;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -100,6 +102,36 @@ public class OrderRecordServiceImpl extends ServiceImpl<OrderRecordMapper, Order
         countsReturnObject.setDate(dateList);
         countsReturnObject.setValue(valueList);
         return countsReturnObject;
+    }
+
+    @Override
+    public HashMap<String, Object> select(String name, Integer is_vipguest, String begintime, String endtime, Integer start, Integer size) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        QueryWrapper<OrderRecord> wrapper = new QueryWrapper<>();
+        wrapper.like("name", name);
+        wrapper.eq("is_vipguest", is_vipguest);
+        wrapper.between("datetime", begintime, endtime);
+        wrapper.eq("is_delete", 0);
+        Page<OrderRecord> page = new Page<>(start, size);
+        List<OrderRecord> orderRecords = orderRecordMapper.selectPage(page,wrapper).getRecords();
+        Integer total = orderRecordMapper.selectCount(wrapper);
+        hashMap.put("data", orderRecords);
+        hashMap.put("total", total);
+        return hashMap;
+    }
+
+    @Override
+    public Integer countOrderRecord() {
+        QueryWrapper<OrderRecord> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return orderRecordMapper.selectCount(wrapper);
+    }
+
+    @Override
+    public List<OrderRecord> getAllOrderRecords() {
+        QueryWrapper<OrderRecord> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return orderRecordMapper.selectList(wrapper);
     }
 
     private Integer calculateValueList(List<OrderRecord> orderRecords) {

@@ -16,6 +16,7 @@ import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@CrossOrigin(value = "http://localhost:8080")
 @RestController
 @RequestMapping("/bane")
 public class BaneController {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
  * @author jobob
  * @since 2023-10-10
  */
+@CrossOrigin(value = "http://localhost:8080")
 @RestController
 @RequestMapping("/users")
 public class UsersController {
@@ -48,22 +50,23 @@ public class UsersController {
     public PageDataResult<Object> select(@RequestParam("page") Integer page,
                                          @RequestParam("username") String username,
                                          @RequestParam("management") String management,
-                                         @RequestParam("size") Integer size,
-                                         HttpServletRequest request) {
+                                         @RequestParam("size") Integer size) {
         try {
-            Integer start = (page - 1) * size + 1;
-            List<Users> users = usersService.getUsers(username, management, start, size);
-            Integer total = usersService.countUser();
-            PageDataResult<Object> result = PageDataResultUtils.success(users, total);
-            result.setMessage("select success");
-            String token = request.getHeader("Authorization").substring("Bearer ".length());
-            String name = jwtTokenUtil.getUsernameFromToken(token);
-            String type = "查询";
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
-            String formattedDateTime = now.format(formatter);
-            operationLogService.insert(name, type, pageInfo, formattedDateTime);
-            return result;
+            if (size == -1) {
+                List<Users> users = usersService.getAllUsers();
+                Integer total = usersService.countUser();
+                PageDataResult<Object> result = PageDataResultUtils.success(users, total);
+                result.setMessage("select success");
+                return result;
+            } else {
+                Integer start = (page - 1) * size + 1;
+                HashMap<String, Object> hashMap = usersService.getUsers(username, management, start, size);
+                Integer total = (Integer) hashMap.get("total");
+                List<Users> users = (List<Users>) hashMap.get("data");
+                PageDataResult<Object> result = PageDataResultUtils.success(users, total);
+                result.setMessage("select success");
+                return result;
+            }
         } catch (Exception e) {
             PageDataResult<Object> result = PageDataResultUtils.fail();
             result.setMessage(e.getMessage());
@@ -121,7 +124,7 @@ public class UsersController {
                     String name = jwtTokenUtil.getUsernameFromToken(token);
                     String type = "新增";
                     LocalDateTime now = LocalDateTime.now();
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                     String formattedDateTime = now.format(formatter);
                     operationLogService.insert(name, type, pageInfo, formattedDateTime);
                     return result;
@@ -152,7 +155,7 @@ public class UsersController {
                 String username = jwtTokenUtil.getUsernameFromToken(token);
                 String type = "删除";
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = now.format(formatter);
                 operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 return result;
@@ -181,7 +184,7 @@ public class UsersController {
                 String username = jwtTokenUtil.getUsernameFromToken(token);
                 String type = "修改密码";
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = now.format(formatter);
                 operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 return result;
@@ -212,7 +215,7 @@ public class UsersController {
                 String name = jwtTokenUtil.getUsernameFromToken(token);
                 String type = "编辑";
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = now.format(formatter);
                 operationLogService.insert(name, type, pageInfo, formattedDateTime);
                 return result;

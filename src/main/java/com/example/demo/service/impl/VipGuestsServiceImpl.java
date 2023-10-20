@@ -9,6 +9,7 @@ import com.example.demo.service.IVipGuestsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -18,13 +19,25 @@ public class VipGuestsServiceImpl extends ServiceImpl<VipGuestsMapper, VipGuests
     private VipGuestsMapper vipGuestsMapper;
 
     @Override
-    public List<VipGuests> getVipGuests(String name, String registertime, Integer start, Integer size) {
+    public HashMap<String, Object> getVipGuests(String name, String begintime, String endtime, Integer start, Integer size) {
+        HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
         wrapper.like("name", name);
-        wrapper.gt("registertime", registertime);
+        wrapper.between("registertime", begintime, endtime);
         wrapper.eq("is_delete", 0);
         Page<VipGuests> page = new Page<>(start, size);
-        return vipGuestsMapper.selectPage(page, wrapper).getRecords();
+        List<VipGuests> vipGuests = vipGuestsMapper.selectPage(page, wrapper).getRecords();
+        Integer total = vipGuestsMapper.selectCount(wrapper);
+        hashMap.put("data", vipGuests);
+        hashMap.put("total", total);
+        return hashMap;
+    }
+
+    @Override
+    public List<VipGuests> getAllVipGuests() {
+        QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return vipGuestsMapper.selectList(wrapper);
     }
 
     @Override

@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.HashMap;
 
+@CrossOrigin(value = "http://localhost:8080")
 @RestController
 @RequestMapping("/products")
 public class ProductsController {
@@ -33,22 +35,23 @@ public class ProductsController {
     public PageDataResult<Object> select(@RequestParam("name") String name,
                                          @RequestParam("price") String price,
                                          @RequestParam("page") Integer page,
-                                         @RequestParam("size") Integer size,
-                                         HttpServletRequest request) {
+                                         @RequestParam("size") Integer size) {
         try {
-            Integer start = (page - 1) * size;
-            List<Products> products = productsService.select(name, price, start, size);
-            Integer total = productsService.countProducts();
-            PageDataResult<Object> result = PageDataResultUtils.success(products, total);
-            result.setMessage("select success");
-            String token = request.getHeader("Authorization").substring("Bearer ".length());
-            String username = jwtTokenUtil.getUsernameFromToken(token);
-            String type = "查询";
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
-            String formattedDateTime = now.format(formatter);
-            operationLogService.insert(username, type, pageInfo, formattedDateTime);
-            return result;
+            if (size == -1) {
+                List<Products> products = productsService.getAllProducts();
+                Integer total = productsService.countProducts();
+                PageDataResult<Object> result = PageDataResultUtils.success(products, total);
+                result.setMessage("select success");
+                return result;
+            } else {
+                Integer start = (page - 1) * size;
+                HashMap<String, Object> hashMap = productsService.select(name, price, start, size);
+                Integer total = (Integer) hashMap.get("total");
+                List<Products> products = (List<Products>) hashMap.get("data");
+                PageDataResult<Object> result = PageDataResultUtils.success(products, total);
+                result.setMessage("select success");
+                return result;
+            }
         } catch (Exception e) {
             PageDataResult<Object> result = PageDataResultUtils.fail();
             result.setMessage(e.getMessage());
@@ -71,7 +74,7 @@ public class ProductsController {
                 String username = jwtTokenUtil.getUsernameFromToken(token);
                 String type = "新增";
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = now.format(formatter);
                 operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 return result;
@@ -97,7 +100,7 @@ public class ProductsController {
             String username = jwtTokenUtil.getUsernameFromToken(token);
             String type = "删除";
             LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = now.format(formatter);
             operationLogService.insert(username, type, pageInfo, formattedDateTime);
             return result;
@@ -124,7 +127,7 @@ public class ProductsController {
                 String username = jwtTokenUtil.getUsernameFromToken(token);
                 String type = "编辑";
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = now.format(formatter);
                 operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 return result;

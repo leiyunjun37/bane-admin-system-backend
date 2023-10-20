@@ -2,15 +2,15 @@ package com.example.demo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.demo.entity.Pets;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface IPetsService extends IService<Pets> {
 
     Boolean insertPets(String petname, String owner, String variety, Integer age);
 
-    List<Pets> selectPets(Integer start, Integer size, String petname, String variety, String owner, Integer age);
+    HashMap<String, Object> selectPets(Integer start, Integer size, String petname, String variety, String owner, Integer age);
 
     void update(Integer id, String petname, String owner, Integer age, String variety);
 
@@ -23,5 +23,7 @@ public interface IPetsService extends IService<Pets> {
     void deleteThroughGuest(String owner);
 
     void changeOwner(Integer ownerId, String newOwnerName);
+
+    List<Pets> getAllPets();
 
 }

@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 
+@CrossOrigin(value = "http://localhost:8080")
 @RestController
 @RequestMapping("/petserve")
 public class PetServeController {
@@ -33,22 +35,23 @@ public class PetServeController {
     @GetMapping("/get")
     public PageDataResult<Object> select(@RequestParam("serveName") String serveName,
                                          @RequestParam("page") Integer page,
-                                         @RequestParam("size") Integer size,
-                                         HttpServletRequest request) {
+                                         @RequestParam("size") Integer size) {
         try {
-            Integer start = (page - 1) * size;
-            List<PetServe> petServes = petServeService.select(serveName, start, size);
-            Integer total = petServeService.countPetServe();
-            PageDataResult<Object> result = PageDataResultUtils.success(petServes, total);
-            result.setMessage("select success");
-            String token = request.getHeader("Authorization").substring("Bearer ".length());
-            String username = jwtTokenUtil.getUsernameFromToken(token);
-            String type = "查询";
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
-            String formattedDateTime = now.format(formatter);
-            operationLogService.insert(username, type, pageInfo, formattedDateTime);
-            return result;
+            if (size == -1) {
+                List<PetServe> petServes = petServeService.getAllPetServes();
+                Integer total = petServeService.countPetServe();
+                PageDataResult<Object> result = PageDataResultUtils.success(petServes, total);
+                result.setMessage("select success");
+                return result;
+            } else {
+                Integer start = (page - 1) * size;
+                HashMap<String, Object> hashMap = petServeService.select(serveName, start, size);
+                Integer total = (Integer) hashMap.get("total");
+                List<PetServe> petServes = (List<PetServe>) hashMap.get("data");
+                PageDataResult<Object> result = PageDataResultUtils.success(petServes, total);
+                result.setMessage("select success");
+                return result;
+            }
         } catch (Exception e) {
             PageDataResult<Object> result = PageDataResultUtils.fail();
             result.setMessage(e.getMessage());
@@ -71,7 +74,7 @@ public class PetServeController {
                 String username = jwtTokenUtil.getUsernameFromToken(token);
                 String type = "新增";
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = now.format(formatter);
                 operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 return result;
@@ -97,7 +100,7 @@ public class PetServeController {
             String username = jwtTokenUtil.getUsernameFromToken(token);
             String type = "删除";
             LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = now.format(formatter);
             operationLogService.insert(username, type, pageInfo, formattedDateTime);
             return result;
@@ -124,7 +127,7 @@ public class PetServeController {
                 String username = jwtTokenUtil.getUsernameFromToken(token);
                 String type = "编辑";
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = now.format(formatter);
                 operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 return result;

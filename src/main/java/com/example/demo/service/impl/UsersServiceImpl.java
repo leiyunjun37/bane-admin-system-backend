@@ -10,7 +10,7 @@ import com.example.demo.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,13 +32,18 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     private CommonUtils commonUtils;
 
     @Override
-    public List<Users> getUsers(String username, String management, Integer start, Integer size) {
+    public HashMap<String, Object> getUsers(String username, String management, Integer start, Integer size) {
+        HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<Users> wrapper = new QueryWrapper<>();
         wrapper.like("username", username);
         wrapper.like("management", management);
         wrapper.eq("is_delete", 0);
         Page<Users> page = new Page<>(start, size);
-        return usersMapper.selectPage(page, wrapper).getRecords();
+        List<Users> users = usersMapper.selectPage(page, wrapper).getRecords();
+        Integer total = usersMapper.selectCount(wrapper);
+        hashMap.put("data", users);
+        hashMap.put("total", total);
+        return hashMap;
     }
 
     @Override
@@ -78,11 +83,10 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     @Override
     public void login(String username, String lastlogin) {
         Users user = new Users();
-        user.setUsername(username);
-        user.setIs_delete(0);
+        user.setLastlogin(lastlogin);
         QueryWrapper<Users> wrapper = new QueryWrapper<>();
         wrapper.eq("username", username)
-                .eq("lastlogin", lastlogin);
+                .eq("is_delete", 0);
         usersMapper.update(user, wrapper);
     }
 
@@ -126,6 +130,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
         users.setPassword(password);
         users.setEncryptedpassword(commonUtils.md5(password));
         usersMapper.updateById(users);
+    }
+
+    @Override
+    public List<Users> getAllUsers() {
+        QueryWrapper<Users> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return usersMapper.selectList(wrapper);
     }
 
 }

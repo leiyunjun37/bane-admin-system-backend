@@ -9,6 +9,7 @@ import com.example.demo.service.IPetServeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -18,12 +19,17 @@ public class PetServeServiceImpl extends ServiceImpl<PetServeMapper, PetServe> i
     private PetServeMapper petServeMapper;
 
     @Override
-    public List<PetServe> select(String serveName, Integer start, Integer size) {
+    public HashMap<String, Object> select(String serveName, Integer start, Integer size) {
+        HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<PetServe> wrapper = new QueryWrapper<>();
         wrapper.like("serveName", serveName);
         wrapper.eq("is_delete", 0);
         Page<PetServe> page = new Page<>(start, size);
-        return petServeMapper.selectPage(page, wrapper).getRecords();
+        List<PetServe> petServes = petServeMapper.selectPage(page, wrapper).getRecords();
+        Integer total = petServeMapper.selectCount(wrapper);
+        hashMap.put("data", petServes);
+        hashMap.put("total", total);
+        return hashMap;
     }
 
     @Override
@@ -70,5 +76,12 @@ public class PetServeServiceImpl extends ServiceImpl<PetServeMapper, PetServe> i
         QueryWrapper<PetServe> wrapper = new QueryWrapper<>();
         wrapper.eq("is_delete", 0);
         return petServeMapper.selectCount(wrapper);
+    }
+
+    @Override
+    public List<PetServe> getAllPetServes() {
+        QueryWrapper<PetServe> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        return petServeMapper.selectList(wrapper);
     }
 }

@@ -13,9 +13,11 @@ import com.example.demo.utils.RequestBody.Vipguests.VipguestInsertObject;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
+@CrossOrigin(value = "http://localhost:8080")
 @RestController
 @RequestMapping("/vipguests")
 public class VipGuestsController {
@@ -37,23 +39,25 @@ public class VipGuestsController {
     @GetMapping("/get")
     public PageDataResult<Object> select(@RequestParam("page") Integer page,
                                          @RequestParam("name") String name,
-                                         @RequestParam("registertime") String registertime,
-                                         @RequestParam("size") Integer size,
-                                         HttpServletRequest request) {
+                                         @RequestParam("begintime") String begintime,
+                                         @RequestParam("endtime") String endtime,
+                                         @RequestParam("size") Integer size) {
         try {
-            Integer start = (page - 1) * size + 1;
-            List<VipGuests> vipGuests = vipGuestsService.getVipGuests(name, registertime, start, size);
-            Integer total = vipGuestsService.countVipGuest();
-            PageDataResult<Object> result = PageDataResultUtils.success(vipGuests, total);
-            result.setMessage("select success");
-            String token = request.getHeader("Authorization").substring("Bearer ".length());
-            String username = jwtTokenUtil.getUsernameFromToken(token);
-            String type = "查询";
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
-            String formattedDateTime = now.format(formatter);
-            operationLogService.insert(username, type, pageInfo, formattedDateTime);
-            return result;
+            if (size == -1) {
+                List<VipGuests> vipGuests = vipGuestsService.getAllVipGuests();
+                Integer total = vipGuestsService.countVipGuest();
+                PageDataResult<Object> result = PageDataResultUtils.success(vipGuests, total);
+                result.setMessage("select success");
+                return result;
+            } else {
+                Integer start = (page - 1) * size + 1;
+                HashMap<String, Object> hashMap = vipGuestsService.getVipGuests(name, begintime, endtime, start, size);
+                List<VipGuests> vipGuests = (List<VipGuests>) hashMap.get("data");
+                Integer total = (Integer) hashMap.get("total");
+                PageDataResult<Object> result = PageDataResultUtils.success(vipGuests, total);
+                result.setMessage("select success");
+                return result;
+            }
         } catch (Exception e) {
             PageDataResult<Object> result = PageDataResultUtils.fail();
             result.setMessage(e.getMessage());
@@ -76,7 +80,7 @@ public class VipGuestsController {
                 }
                 Integer balance = requestBody.getBalance();
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String registertime = now.format(formatter);
                 vipGuestsService.insertVipGuests(name, registertime, conway, balance);
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
@@ -110,7 +114,7 @@ public class VipGuestsController {
             String username = jwtTokenUtil.getUsernameFromToken(token);
             String type = "删除";
             LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = now.format(formatter);
             operationLogService.insert(username, type, pageInfo, formattedDateTime);
             operationLogService.insert(username, type, "宠物信息", formattedDateTime);
@@ -139,7 +143,7 @@ public class VipGuestsController {
                 String username = jwtTokenUtil.getUsernameFromToken(token);
                 String type = "编辑";
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String formattedDateTime = now.format(formatter);
                 operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 operationLogService.insert(username, type, "宠物信息", formattedDateTime);
