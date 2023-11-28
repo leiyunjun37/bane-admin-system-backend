@@ -19,13 +19,13 @@ public class PetServeServiceImpl extends ServiceImpl<PetServeMapper, PetServe> i
     private PetServeMapper petServeMapper;
 
     @Override
-    public HashMap<String, Object> select(String serveName, Integer start, Integer size) {
+    public HashMap<String, Object> select(String serveName) {
         HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<PetServe> wrapper = new QueryWrapper<>();
         wrapper.like("serveName", serveName);
         wrapper.eq("is_delete", 0);
-        Page<PetServe> page = new Page<>(start, size);
-        List<PetServe> petServes = petServeMapper.selectPage(page, wrapper).getRecords();
+        wrapper.orderByDesc("create_time");
+        List<PetServe> petServes = petServeMapper.selectList(wrapper);
         Integer total = petServeMapper.selectCount(wrapper);
         hashMap.put("data", petServes);
         hashMap.put("total", total);
@@ -33,21 +33,43 @@ public class PetServeServiceImpl extends ServiceImpl<PetServeMapper, PetServe> i
     }
 
     @Override
-    public Boolean checkServeNameUnique(String serveName) {
+    public Boolean checkServeNameUnique(String serveName, Integer id) {
         QueryWrapper<PetServe> wrapper = new QueryWrapper<>();
-        wrapper.eq("serveName", serveName);
         wrapper.eq("is_delete", 0);
-        PetServe exist = petServeMapper.selectOne(wrapper);
+        List<PetServe> petServes = petServeMapper.selectList(wrapper);
+        boolean result = true;
+        for(PetServe serve : petServes) {{
+            if (serve.getServeName().equals(serveName)) {
+                if(!serve.getId().equals(id)) {
+                    result = false;
+                    break;
+                }
+            }
+        }}
+        return result;
+    }
+
+    @Override
+    public Boolean checkInsertServeNameUnique(String serveName) {
+        QueryWrapper<PetServe> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        wrapper.eq("serveName", serveName);
+        PetServe exist = petServeMapper.selectOne(wrapper);;
         return exist == null;
     }
 
     @Override
-    public void insert(String serveName, String comment, Integer price, String unit) {
+    public void insert(String serveName, String comment, Integer price, String create_time) {
         PetServe petServe = new PetServe();
-        petServe.setComment(comment);
+        if (comment.isEmpty()) {
+            petServe.setComment("-");
+        } else {
+            petServe.setComment(comment);
+        }
         petServe.setServeName(serveName);
         petServe.setIs_delete(0);
-        petServe.setUnit(unit);
+        petServe.setCreate_time(create_time);
+        petServe.setUpdate_time("-");
         petServe.setPrice(price);
         petServeMapper.insert(petServe);
     }
@@ -61,12 +83,16 @@ public class PetServeServiceImpl extends ServiceImpl<PetServeMapper, PetServe> i
     }
 
     @Override
-    public void update(Integer id, String serveName, Integer price, String unit, String comment) {
+    public void update(Integer id, String serveName, Integer price, String update_time, String comment) {
         PetServe petServe = new PetServe();
         petServe.setId(id);
-        petServe.setComment(comment);
+        if (Boolean.TRUE.equals(comment.isEmpty())) {
+            petServe.setComment("-");
+        } else {
+            petServe.setComment(comment);
+        }
         petServe.setServeName(serveName);
-        petServe.setUnit(unit);
+        petServe.setUpdate_time(update_time);
         petServe.setPrice(price);
         petServeMapper.updateById(petServe);
     }

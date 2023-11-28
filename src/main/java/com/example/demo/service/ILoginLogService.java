@@ -11,7 +11,7 @@ public interface ILoginLogService extends IService<LoginLog> {
 
     void insert(String username, String logintime);
 
-    HashMap<String, Object> select(String username, String begintime, String endtime, Integer start, Integer size);
+    HashMap<String, Object> select(String username, String begintime, String endtime);
 
     Integer countLoginLog();
 

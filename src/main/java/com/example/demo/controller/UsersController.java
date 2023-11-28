@@ -8,6 +8,7 @@ import com.example.demo.service.IUsersService;
 import com.example.demo.utils.*;
 import com.example.demo.utils.RequestBody.Users.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -33,6 +35,9 @@ public class UsersController {
     private IUsersService usersService;
 
     @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
     private ILoginLogService loginLogService;
 
     @Autowired
@@ -46,6 +51,9 @@ public class UsersController {
 
     public static String pageInfo = "用户信息";
 
+    public UsersController() {
+    }
+
     @GetMapping("/get")
     public PageDataResult<Object> select(@RequestParam("page") Integer page,
                                          @RequestParam("username") String username,
@@ -55,20 +63,52 @@ public class UsersController {
             if (size == -1) {
                 List<Users> users = usersService.getAllUsers();
                 Integer total = usersService.countUser();
-                PageDataResult<Object> result = PageDataResultUtils.success(users, total);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", users);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             } else {
-                Integer start = (page - 1) * size + 1;
-                HashMap<String, Object> hashMap = usersService.getUsers(username, management, start, size);
+                Integer start = (page - 1) * size;
+                Integer end = start + size;
+                HashMap<String, Object> hashMap = usersService.getUsers(username, management);
                 Integer total = (Integer) hashMap.get("total");
-                List<Users> users = (List<Users>) hashMap.get("data");
-                PageDataResult<Object> result = PageDataResultUtils.success(users, total);
+                List<Users> data = (List<Users>) hashMap.get("data");
+                List<Users> users;
+                if (total < size) {
+                    users = data.subList(start, total);
+                } else {
+                    users = data.subList(start, end);
+                }
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", users);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             }
         } catch (Exception e) {
             PageDataResult<Object> result = PageDataResultUtils.fail();
+            result.setMessage(e.getMessage());
+            return result;
+        }
+    }
+
+    @PostMapping("/logout")
+    public PageLogoutResult<Object> logout(@RequestBody UsersLogoutObject requestBody) {
+        try {
+            String username = requestBody.getUsername();
+            if (Boolean.TRUE.equals(redisTemplate.hasKey(username))) {
+                redisTemplate.delete(username);
+                return PageLogoutResultUtils.success();
+            } else {
+                PageLogoutResult<Object> result = PageLogoutResultUtils.success();
+                result.setMessage("have no this user login record");
+                return result;
+            }
+        } catch (Exception e) {
+            PageLogoutResult<Object> result = PageLogoutResultUtils.success();
             result.setMessage(e.getMessage());
             return result;
         }
@@ -83,29 +123,31 @@ public class UsersController {
                 LocalDateTime now = LocalDateTime.now();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String lastlogin = now.format(formatter);
-                usersService.login(username, lastlogin);
+                String type = usersService.login(username, lastlogin);
                 loginLogService.insert(username, lastlogin);
                 PageLoginResult<Object> result = PageLoginResultUtils.success();
                 String token = jwtTokenUtil.generateToken(username);
-                result.setUsername(username);
-                result.setPassword(md5Password);
-                result.setToken(token);
+                redisTemplate.opsForValue().set(username, token, 4, TimeUnit.HOURS);
+                HashMap<String, Object> data = new HashMap<>();
+                data.put("username", username);
+                data.put("token", token);
+                data.put("management", type);
+                result.setData(data);
                 return result;
             } else {
                 PageLoginResult<Object> result = PageLoginResultUtils.fail();
-                result.setUsername(username);
-                result.setPassword(md5Password);
-                result.setToken("invalid password");
+                HashMap<String, Object> data = new HashMap<>();
+                result.setData(data);
+                result.setMessage("invalid password");
                 return result;
             }
         } catch (Exception e) {
             PageLoginResult<Object> result = PageLoginResultUtils.fail();
-            result.setUsername(null);
-            result.setPassword(null);
-            result.setToken(e.getMessage());
+            HashMap<String, Object> data = new HashMap<>();
+            result.setData(data);
+            result.setMessage(e.getMessage());
             return result;
         }
-
     }
 
     @PostMapping("/post")

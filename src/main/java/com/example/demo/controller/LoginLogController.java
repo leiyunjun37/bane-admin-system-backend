@@ -28,15 +28,28 @@ public class LoginLogController {
             if (size == -1) {
                 List<LoginLog> loginLogs = loginLogService.getAllLoginLogs();
                 Integer total = loginLogService.countLoginLog();
-                PageDataResult<Object> result = PageDataResultUtils.success(loginLogs, total);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", loginLogs);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             } else {
                 Integer start = ( page - 1) * size;
-                HashMap<String, Object> hashMap = loginLogService.select(username, begintime, endtime, start, size);
+                Integer end = start + size;
+                HashMap<String, Object> hashMap = loginLogService.select(username, begintime, endtime);
                 Integer total = (Integer) hashMap.get("total");
-                List<LoginLog> loginLogs = (List<LoginLog>) hashMap.get("data");
-                PageDataResult<Object> result = PageDataResultUtils.success(loginLogs, total);
+                List<LoginLog> data = (List<LoginLog>) hashMap.get("data");
+                List<LoginLog> loginLogs;
+                if (total < end) {
+                    loginLogs = data.subList(start, total);
+                } else {
+                    loginLogs = data.subList(start, end);
+                }
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", loginLogs);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             }

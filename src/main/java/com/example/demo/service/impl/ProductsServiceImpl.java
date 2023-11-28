@@ -19,14 +19,13 @@ public class ProductsServiceImpl extends ServiceImpl<ProductsMapper, Products> i
     private ProductsMapper productsMapper;
 
     @Override
-    public HashMap<String, Object> select(String name, String price, Integer start, Integer size) {
+    public HashMap<String, Object> select(String name) {
         HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<Products> wrapper = new QueryWrapper<>();
         wrapper.like("name", name);
-        wrapper.gt("price", price);
         wrapper.eq("is_delete", 0);
-        Page<Products> page = new Page<>(start, size);
-        List<Products> products = productsMapper.selectPage(page, wrapper).getRecords();
+        wrapper.orderByDesc("create_time");
+        List<Products> products = productsMapper.selectList(wrapper);
         Integer total = productsMapper.selectCount(wrapper);
         hashMap.put("data", products);
         hashMap.put("total", total);
@@ -34,18 +33,40 @@ public class ProductsServiceImpl extends ServiceImpl<ProductsMapper, Products> i
     }
 
     @Override
-    public void insert(String name, String comment, Integer price, Integer inventory) {
+    public void insert(String name, String comment, Integer price, Integer inventory, String create_time) {
         Products products = new Products();
-        products.setComment(comment);
+        if (comment.isEmpty()) {
+            products.setComment("-");
+        } else {
+            products.setComment(comment);
+        }
         products.setInventory(inventory);
         products.setPrice(price);
         products.setName(name);
         products.setIs_delete(0);
+        products.setCreate_time(create_time);
         productsMapper.insert(products);
     }
 
     @Override
-    public Boolean checkNameUnique(String name) {
+    public Boolean checkNameUnique(String name, Integer id) {
+        QueryWrapper<Products> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_delete", 0);
+        List<Products> products = productsMapper.selectList(wrapper);
+        boolean result = true;
+        for(Products product : products) {
+            if (product.getName().equals(name)) {
+                if (!product.getId().equals(id)) {
+                    result = false;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Boolean checkInsertNameUnique(String name) {
         QueryWrapper<Products> wrapper = new QueryWrapper<>();
         wrapper.eq("name", name);
         wrapper.eq("is_delete", 0);
@@ -62,13 +83,18 @@ public class ProductsServiceImpl extends ServiceImpl<ProductsMapper, Products> i
     }
 
     @Override
-    public void update(Integer id, String name, Integer price, Integer inventory, String comment) {
+    public void update(Integer id, String name, Integer price, Integer inventory, String comment, String update_time) {
         Products products = new Products();
         products.setId(id);
-        products.setComment(comment);
+        if (comment.isEmpty()) {
+            products.setComment("-");
+        } else {
+            products.setComment(comment);
+        }
         products.setInventory(inventory);
         products.setPrice(price);
         products.setName(name);
+        products.setUpdate_time(update_time);
         productsMapper.updateById(products);
     }
 

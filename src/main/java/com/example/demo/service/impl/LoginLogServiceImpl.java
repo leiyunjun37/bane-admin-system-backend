@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LoginLogServiceImpl extends ServiceImpl<LoginLogMapper, LoginLog> implements ILoginLogService {
@@ -28,14 +29,16 @@ public class LoginLogServiceImpl extends ServiceImpl<LoginLogMapper, LoginLog> i
     }
 
     @Override
-    public HashMap<String, Object> select(String username, String begintime, String endtime, Integer start, Integer size) {
+    public HashMap<String, Object> select(String username, String begintime, String endtime) {
         HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<LoginLog> wrapper = new QueryWrapper<>();
         wrapper.like("username", username);
-        wrapper.between("logintime", begintime, endtime);
+        if (!Objects.equals(begintime, "") && !Objects.equals(endtime, "")) {
+            wrapper.between("logintime", begintime, endtime);
+        }
+        wrapper.orderByDesc("logintime");
         wrapper.eq("is_delete", 0);
-        Page<LoginLog> page = new Page<>(start, size);
-        List<LoginLog> loginLogs = loginLogMapper.selectPage(page,wrapper).getRecords();
+        List<LoginLog> loginLogs = loginLogMapper.selectList(wrapper);
         Integer total = loginLogMapper.selectCount(wrapper);
         hashMap.put("data", loginLogs);
         hashMap.put("total", total);

@@ -7,13 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 
 public interface IVipGuestsService extends IService<VipGuests> {
-    HashMap<String, Object> getVipGuests(String name, String begintime, String endtime, Integer start, Integer size);
+    HashMap<String, Object> getVipGuests(String name, String begintime, String endtime);
 
     List<VipGuests> getAllVipGuests();
 
     Boolean insertVipGuests(String name, String registertime, String conway, Integer balance);
 
-    Boolean checkUnqiue(String col, Object value);
+    Boolean checkUnqiue(String col, Object value, Integer id);
+
+    Boolean checkInsertUnqiue(String col, Object value);
 
     String updateIsDelete(Integer id);
 

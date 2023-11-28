@@ -10,7 +10,7 @@ public interface IOperationLogService extends IService<OperationLog> {
 
     void insert(String username, String type, String page, String datetime);
 
-    HashMap<String, Object> select(String username, String pageInfo, String type, String begintime, String endtime, Integer start, Integer size);
+    HashMap<String, Object> select(String username, String pageInfo, String type, String begintime, String endtime);
 
     Integer countOperationLog();
 

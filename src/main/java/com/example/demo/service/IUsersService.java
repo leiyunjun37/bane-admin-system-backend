@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface IUsersService extends IService<Users> {
 
-    HashMap<String, Object> getUsers(String username, String management, Integer start, Integer size);
+    HashMap<String, Object> getUsers(String username, String management);
 
     void insertUsers(String username, String password, String management, String encryptedpassword);
 
@@ -24,7 +24,7 @@ public interface IUsersService extends IService<Users> {
 
     Boolean checkUsernameUnique(String username);
 
-    void login(String username, String lastlogin);
+    String login(String username, String lastlogin);
 
     Boolean delete(Integer id);
 

@@ -45,7 +45,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         try {
             response.setStatus(statusCode);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            invalidTokenResult<Object> errorResponse = invalidTokenResultUtils.error(11111, false, message);
+            invalidTokenResult<Object> errorResponse = invalidTokenResultUtils.error(401, false, message);
             OutputStream outputStream = response.getOutputStream();
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(outputStream, errorResponse);

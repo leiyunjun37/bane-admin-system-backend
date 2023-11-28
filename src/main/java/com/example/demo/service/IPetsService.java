@@ -8,13 +8,15 @@ import java.util.List;
 
 public interface IPetsService extends IService<Pets> {
 
-    Boolean insertPets(String petname, String owner, String variety, Integer age);
+    Boolean insertPets(String petname, String owner, String variety, Integer age, String create_time);
 
-    HashMap<String, Object> selectPets(Integer start, Integer size, String petname, String variety, String owner, Integer age);
+    HashMap<String, Object> selectPets(String petname, String variety, String owner);
 
-    void update(Integer id, String petname, String owner, Integer age, String variety);
+    void update(Integer id, String petname, String owner, Integer age, String variety, String update_time);
 
-    Boolean checkPetnameOwnerUnique(String owner, String petname, String variety);
+    Boolean checkPetnameOwnerUnique(String owner, String petname, Integer id);
+
+    Boolean checkInsertPetnameOwnerUnique(String owner, String petname);
 
     void delete(Integer id);
 

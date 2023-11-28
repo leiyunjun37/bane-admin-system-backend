@@ -105,15 +105,14 @@ public class OrderRecordServiceImpl extends ServiceImpl<OrderRecordMapper, Order
     }
 
     @Override
-    public HashMap<String, Object> select(String name, Integer is_vipguest, String begintime, String endtime, Integer start, Integer size) {
+    public HashMap<String, Object> select(String name, Integer is_vipguest, String begintime, String endtime) {
         HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<OrderRecord> wrapper = new QueryWrapper<>();
         wrapper.like("name", name);
         wrapper.eq("is_vipguest", is_vipguest);
         wrapper.between("datetime", begintime, endtime);
         wrapper.eq("is_delete", 0);
-        Page<OrderRecord> page = new Page<>(start, size);
-        List<OrderRecord> orderRecords = orderRecordMapper.selectPage(page,wrapper).getRecords();
+        List<OrderRecord> orderRecords = orderRecordMapper.selectList(wrapper);
         Integer total = orderRecordMapper.selectCount(wrapper);
         hashMap.put("data", orderRecords);
         hashMap.put("total", total);

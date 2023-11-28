@@ -8,6 +8,7 @@ import com.example.demo.service.IUsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.demo.utils.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -32,14 +33,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     private CommonUtils commonUtils;
 
     @Override
-    public HashMap<String, Object> getUsers(String username, String management, Integer start, Integer size) {
+    public HashMap<String, Object> getUsers(String username, String management) {
         HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<Users> wrapper = new QueryWrapper<>();
         wrapper.like("username", username);
         wrapper.like("management", management);
         wrapper.eq("is_delete", 0);
-        Page<Users> page = new Page<>(start, size);
-        List<Users> users = usersMapper.selectPage(page, wrapper).getRecords();
+        List<Users> users = usersMapper.selectList(wrapper);
         Integer total = usersMapper.selectCount(wrapper);
         hashMap.put("data", users);
         hashMap.put("total", total);
@@ -81,13 +81,14 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users> implements
     }
 
     @Override
-    public void login(String username, String lastlogin) {
+    public String login(String username, String lastlogin) {
         Users user = new Users();
         user.setLastlogin(lastlogin);
         QueryWrapper<Users> wrapper = new QueryWrapper<>();
         wrapper.eq("username", username)
                 .eq("is_delete", 0);
         usersMapper.update(user, wrapper);
+        return usersMapper.selectOne(wrapper).getManagement();
     }
 
     @Override

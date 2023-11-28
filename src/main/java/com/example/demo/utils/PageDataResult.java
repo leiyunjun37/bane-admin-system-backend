@@ -2,6 +2,8 @@ package com.example.demo.utils;
 
 import lombok.Data;
 
+import java.util.HashMap;
+
 @Data
 public class PageDataResult<T> {
 
@@ -9,9 +11,7 @@ public class PageDataResult<T> {
 
     private Boolean success;
 
-    private T data;
-
-    private Integer total;
+    private HashMap<String, Object> data;
 
     private String message;
 }

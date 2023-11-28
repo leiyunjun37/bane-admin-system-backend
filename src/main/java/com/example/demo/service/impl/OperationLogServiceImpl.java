@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, OperationLog> implements IOperationLogService {
@@ -30,16 +31,18 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     }
 
     @Override
-    public HashMap<String, Object> select(String username, String pageInfo, String type, String begintime, String endtime, Integer start, Integer size) {
+    public HashMap<String, Object> select(String username, String pageInfo, String type, String begintime, String endtime) {
         HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<OperationLog> wrapper = new QueryWrapper<>();
         wrapper.like("username", username);
         wrapper.like("type", type);
-        wrapper.between("datetime", begintime, endtime);
+        wrapper.orderByDesc("datetime");
+        if (!Objects.equals(begintime, "") && !Objects.equals(endtime, "")) {
+            wrapper.between("datetime", begintime, endtime);
+        }
         wrapper.eq("is_delete", 0);
         wrapper.like("page", pageInfo);
-        Page<OperationLog> page = new Page<>(start, size);
-        List<OperationLog> operationLogs = operationLogMapper.selectPage(page,wrapper).getRecords();
+        List<OperationLog> operationLogs = operationLogMapper.selectList(wrapper);
         Integer total = operationLogMapper.selectCount(wrapper);
         hashMap.put("data", operationLogs);
         hashMap.put("total", total);

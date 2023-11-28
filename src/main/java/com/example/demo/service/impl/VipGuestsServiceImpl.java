@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class VipGuestsServiceImpl extends ServiceImpl<VipGuestsMapper, VipGuests> implements IVipGuestsService {
@@ -19,15 +20,18 @@ public class VipGuestsServiceImpl extends ServiceImpl<VipGuestsMapper, VipGuests
     private VipGuestsMapper vipGuestsMapper;
 
     @Override
-    public HashMap<String, Object> getVipGuests(String name, String begintime, String endtime, Integer start, Integer size) {
+    public HashMap<String, Object> getVipGuests(String name, String begintime, String endtime) {
         HashMap<String, Object> hashMap = new HashMap<>();
         QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("registertime");
         wrapper.like("name", name);
-        wrapper.between("registertime", begintime, endtime);
+        if (!Objects.equals(begintime, "") && !Objects.equals(endtime, "")) {
+            wrapper.between("registertime", begintime, endtime);
+        }
         wrapper.eq("is_delete", 0);
-        Page<VipGuests> page = new Page<>(start, size);
-        List<VipGuests> vipGuests = vipGuestsMapper.selectPage(page, wrapper).getRecords();
         Integer total = vipGuestsMapper.selectCount(wrapper);
+        List<VipGuests> vipGuests = vipGuestsMapper.selectList(wrapper);
+        System.out.println(vipGuests);
         hashMap.put("data", vipGuests);
         hashMap.put("total", total);
         return hashMap;
@@ -54,7 +58,18 @@ public class VipGuestsServiceImpl extends ServiceImpl<VipGuestsMapper, VipGuests
     }
 
     @Override
-    public Boolean checkUnqiue(String col, Object value){
+    public Boolean checkUnqiue(String col, Object value, Integer id){
+        QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
+        wrapper.eq(col, value);
+        wrapper.eq("is_delete", 0);
+        VipGuests vipGuests = vipGuestsMapper.selectOne(wrapper);
+        if (vipGuests == null) {
+            return true;
+        } else return vipGuests.getId().equals(id);
+    }
+
+    @Override
+    public Boolean checkInsertUnqiue(String col, Object value) {
         QueryWrapper<VipGuests> wrapper = new QueryWrapper<>();
         wrapper.eq(col, value);
         wrapper.eq("is_delete", 0);
@@ -69,9 +84,8 @@ public class VipGuestsServiceImpl extends ServiceImpl<VipGuestsMapper, VipGuests
         VipGuests vipGuests = vipGuestsMapper.selectOne(wrapper);
         String owner = vipGuests.getName();
         VipGuests vipGuest = new VipGuests();
-        vipGuests.setId(id);
-        vipGuests.setIs_delete(1);
-        vipGuestsMapper.updateById(vipGuest);
+        vipGuest.setIs_delete(1);
+        vipGuestsMapper.update(vipGuest, wrapper);
         return owner;
     }
 

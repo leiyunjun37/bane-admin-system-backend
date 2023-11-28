@@ -17,7 +17,7 @@ public interface IOrderRecordService extends IService<OrderRecord> {
 
     CountsReturnObject counts(Integer type);
 
-    HashMap<String, Object> select(String name, Integer is_vipguest, String begintime, String endtime, Integer start, Integer size);
+    HashMap<String, Object> select(String name, Integer is_vipguest, String begintime, String endtime);
 
     Integer countOrderRecord();
 

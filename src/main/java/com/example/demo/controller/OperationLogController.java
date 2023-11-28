@@ -30,15 +30,28 @@ public class OperationLogController {
             if (size == -1) {
                 List<OperationLog> operationLogs = operationLogService.getAllOperationLogs();
                 Integer total = operationLogService.countOperationLog();
-                PageDataResult<Object> result = PageDataResultUtils.success(operationLogs, total);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", operationLogs);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             } else {
                 Integer start = ( page - 1) * size;
-                HashMap<String, Object> hashMap = operationLogService.select(username, pageInfo, type, begintime, endtime, start, size);
+                Integer end = start + size;
+                HashMap<String, Object> hashMap = operationLogService.select(username, pageInfo, type, begintime, endtime);
                 Integer total = (Integer) hashMap.get("total");
-                List<OperationLog> operationLogs = (List<OperationLog>) hashMap.get("data");
-                PageDataResult<Object> result = PageDataResultUtils.success(operationLogs, total);
+                List<OperationLog> data = (List<OperationLog>) hashMap.get("data");
+                List<OperationLog> operationLogs;
+                if (total < end) {
+                    operationLogs = data.subList(start, total);
+                } else {
+                    operationLogs = data.subList(start, end);
+                }
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", operationLogs);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             }

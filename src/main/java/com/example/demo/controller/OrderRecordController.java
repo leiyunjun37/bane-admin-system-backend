@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.OperationLog;
 import com.example.demo.entity.OrderRecord;
 import com.example.demo.service.IOrderRecordService;
 import com.example.demo.utils.PageDataResult;
@@ -30,15 +29,28 @@ public class OrderRecordController {
             if (size == -1) {
                 List<OrderRecord> orderRecords = orderRecordService.getAllOrderRecords();
                 Integer total = orderRecordService.countOrderRecord();
-                PageDataResult<Object> result = PageDataResultUtils.success(orderRecords, total);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", orderRecords);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             } else {
                 Integer start = ( page - 1) * size;
-                HashMap<String, Object> hashMap = orderRecordService.select(name, is_vipguest, begintime, endtime, start, size);
+                Integer end = start + size;
+                HashMap<String, Object> hashMap = orderRecordService.select(name, is_vipguest, begintime, endtime);
                 Integer total = (Integer) hashMap.get("total");
-                List<OrderRecord> orderRecords = (List<OrderRecord>) hashMap.get("data");
-                PageDataResult<Object> result = PageDataResultUtils.success(orderRecords, total);
+                List<OrderRecord> data = (List<OrderRecord>) hashMap.get("data");
+                List<OrderRecord> orderRecords;
+                if (total < size) {
+                    orderRecords = data.subList(start, total);
+                } else {
+                    orderRecords = data.subList(start, end);
+                }
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", orderRecords);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             }

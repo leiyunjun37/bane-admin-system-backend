@@ -8,11 +8,13 @@ import java.util.List;
 
 public interface IPetServeService extends IService<PetServe> {
 
-    HashMap<String, Object> select(String serveName, Integer start, Integer size);
+    HashMap<String, Object> select(String serveName);
 
-    Boolean checkServeNameUnique(String serveName);
+    Boolean checkServeNameUnique(String serveName, Integer id);
 
-    void insert(String serveName, String comment, Integer price, String unit);
+    Boolean checkInsertServeNameUnique(String serveName);
+
+    void insert(String serveName, String comment, Integer price, String create_time);
 
     void delete(Integer id);
 

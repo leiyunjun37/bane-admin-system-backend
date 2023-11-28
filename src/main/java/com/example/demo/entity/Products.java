@@ -42,4 +42,12 @@ public class Products {
     @TableField("is_delete")
     @Setter
     private Integer is_delete;
+
+    @TableField("create_time")
+    @Setter
+    private String create_time;
+
+    @TableField("update_time")
+    @Setter
+    private String update_time;
 }

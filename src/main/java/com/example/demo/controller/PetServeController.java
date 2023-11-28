@@ -40,15 +40,28 @@ public class PetServeController {
             if (size == -1) {
                 List<PetServe> petServes = petServeService.getAllPetServes();
                 Integer total = petServeService.countPetServe();
-                PageDataResult<Object> result = PageDataResultUtils.success(petServes, total);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", petServes);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             } else {
                 Integer start = (page - 1) * size;
-                HashMap<String, Object> hashMap = petServeService.select(serveName, start, size);
+                Integer end = start + size;
+                HashMap<String, Object> hashMap = petServeService.select(serveName);
                 Integer total = (Integer) hashMap.get("total");
-                List<PetServe> petServes = (List<PetServe>) hashMap.get("data");
-                PageDataResult<Object> result = PageDataResultUtils.success(petServes, total);
+                List<PetServe> data = (List<PetServe>) hashMap.get("data");
+                List<PetServe> petServes;
+                if (total < size) {
+                    petServes = data.subList(start, total);
+                } else {
+                    petServes = data.subList(start, end);
+                }
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", petServes);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             }
@@ -63,19 +76,18 @@ public class PetServeController {
     public PageNoneDataResult<Object> insert(@RequestBody PetServeInsertObject requestBody, HttpServletRequest request) {
         try {
             String serveName = requestBody.getServeName();
-            if (petServeService.checkServeNameUnique(serveName)) {
-                String unit = requestBody.getUnit();
+            if (petServeService.checkInsertServeNameUnique(serveName)) {
                 Integer price = requestBody.getPrice();
                 String comment = requestBody.getComment();
-                petServeService.insert(serveName, comment, price, unit);
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String formattedDateTime = now.format(formatter);
+                petServeService.insert(serveName, comment, price, formattedDateTime);
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
                 result.setMessage("insert success");
                 String token = request.getHeader("Authorization").substring("Bearer ".length());
                 String username = jwtTokenUtil.getUsernameFromToken(token);
                 String type = "新增";
-                LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                String formattedDateTime = now.format(formatter);
                 operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 return result;
             } else {
@@ -115,20 +127,19 @@ public class PetServeController {
     public PageNoneDataResult<Object> update(@RequestBody PetServeUpdateObject requestBody, HttpServletRequest request) {
         try {
             String serveName = requestBody.getServeName();
-            if (petServeService.checkServeNameUnique(serveName)) {
-                Integer id = requestBody.getId();
+            Integer id = requestBody.getId();
+            if (petServeService.checkServeNameUnique(serveName, id)) {
                 String comment = requestBody.getComment();
                 Integer price = requestBody.getPrice();
-                String unit = requestBody.getUnit();
-                petServeService.update(id, serveName, price, unit, comment);
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                String formattedDateTime = now.format(formatter);
+                petServeService.update(id, serveName, price, formattedDateTime, comment);
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
                 result.setMessage("update success");
                 String token = request.getHeader("Authorization").substring("Bearer ".length());
                 String username = jwtTokenUtil.getUsernameFromToken(token);
                 String type = "编辑";
-                LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                String formattedDateTime = now.format(formatter);
                 operationLogService.insert(username, type, pageInfo, formattedDateTime);
                 return result;
             } else {

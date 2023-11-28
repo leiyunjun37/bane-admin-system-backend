@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -134,7 +135,9 @@ public class BaneController {
     public PageDataResult<Object> counts(@RequestParam("type") Integer type) {
         try {
             CountsReturnObject countsReturnObject = orderRecordService.counts(type);
-            PageDataResult<Object> result = PageDataResultUtils.success(countsReturnObject, null);
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("records", countsReturnObject);
+            PageDataResult<Object> result = PageDataResultUtils.success(map);
             result.setMessage("counts success");
             return result;
         } catch (Exception e) {

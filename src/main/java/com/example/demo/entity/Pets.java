@@ -29,6 +29,14 @@ public class Pets {
     @Getter
     private String owner;
 
+    @TableField("create_time")
+    @Setter
+    private String create_time;
+
+    @TableField("update_time")
+    @Setter
+    private String update_time;
+
     @TableField("age")
     @Setter
     @Getter

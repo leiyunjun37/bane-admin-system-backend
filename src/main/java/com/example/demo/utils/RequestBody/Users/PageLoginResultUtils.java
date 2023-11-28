@@ -14,7 +14,6 @@ public class PageLoginResultUtils {
         PageLoginResult<Object> pageResult = new PageLoginResult<>();
         pageResult.setCode(11111);
         pageResult.setSuccess(false);
-        pageResult.setMessage("login failed");
         return pageResult;
     }
 

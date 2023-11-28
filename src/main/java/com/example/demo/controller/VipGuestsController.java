@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.VipGuests;
 import com.example.demo.service.IOperationLogService;
+import com.example.demo.service.IOrderRecordService;
 import com.example.demo.service.IPetsService;
 import com.example.demo.service.IVipGuestsService;
 import com.example.demo.utils.*;
@@ -13,6 +14,7 @@ import com.example.demo.utils.RequestBody.Vipguests.VipguestInsertObject;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +29,9 @@ public class VipGuestsController {
 
     @Autowired
     private IPetsService petsService;
+
+    @Autowired
+    private IOrderRecordService orderRecordService;
 
     @Autowired
     private IOperationLogService operationLogService;
@@ -46,15 +51,28 @@ public class VipGuestsController {
             if (size == -1) {
                 List<VipGuests> vipGuests = vipGuestsService.getAllVipGuests();
                 Integer total = vipGuestsService.countVipGuest();
-                PageDataResult<Object> result = PageDataResultUtils.success(vipGuests, total);
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", vipGuests);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             } else {
-                Integer start = (page - 1) * size + 1;
-                HashMap<String, Object> hashMap = vipGuestsService.getVipGuests(name, begintime, endtime, start, size);
-                List<VipGuests> vipGuests = (List<VipGuests>) hashMap.get("data");
+                Integer start = (page - 1) * size;
+                Integer end = start + size;
+                HashMap<String, Object> hashMap = vipGuestsService.getVipGuests(name, begintime, endtime);
+                List<VipGuests> data = (List<VipGuests>) hashMap.get("data");
                 Integer total = (Integer) hashMap.get("total");
-                PageDataResult<Object> result = PageDataResultUtils.success(vipGuests, total);
+                List<VipGuests> vipGuests;
+                if (total < end) {
+                    vipGuests = data.subList(start, total);
+                } else {
+                    vipGuests = data.subList(start, end);
+                }
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("records", vipGuests);
+                map.put("total", total);
+                PageDataResult<Object> result = PageDataResultUtils.success(map);
                 result.setMessage("select success");
                 return result;
             }
@@ -72,16 +90,13 @@ public class VipGuestsController {
             String nameCol = "name";
             String conway = requestBody.getConway();
             String conwayCol = "conway";
-            if (vipGuestsService.checkUnqiue(nameCol, name) && vipGuestsService.checkUnqiue(conwayCol, conway)) {
-                String petnames = requestBody.getPets();
-                String[] pets = petnames.split(" ");
-                for (String pet : pets) {
-                    petsService.insertPets(pet, name, "-", 1);
-                }
-                Integer balance = requestBody.getBalance();
+            if (vipGuestsService.checkInsertUnqiue(nameCol, name) && vipGuestsService.checkInsertUnqiue(conwayCol, conway)) {
+                String petname = requestBody.getPets();
                 LocalDateTime now = LocalDateTime.now();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 String registertime = now.format(formatter);
+                petsService.insertPets(petname, name, "-", 1, registertime);
+                Integer balance = requestBody.getBalance();
                 vipGuestsService.insertVipGuests(name, registertime, conway, balance);
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
                 result.setMessage("insert success");
@@ -90,6 +105,8 @@ public class VipGuestsController {
                 String type = "新增";
                 operationLogService.insert(username, type, pageInfo, registertime);
                 operationLogService.insert(username, type, "宠物信息", registertime);
+                String comment = String.format("于%s充值%d元", registertime, balance);
+                orderRecordService.recharge(name, registertime, comment, balance);
                 return result;
             } else {
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
@@ -120,7 +137,7 @@ public class VipGuestsController {
             operationLogService.insert(username, type, "宠物信息", formattedDateTime);
             return result;
         } catch (Exception e) {
-            PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
+            PageNoneDataResult<Object> result = PageNoneDataResultUtils.fail();
             result.setMessage(e.getMessage());
             return result;
         }
@@ -133,11 +150,11 @@ public class VipGuestsController {
             String nameCol = "name";
             String conway = requestBody.getConway();
             String conwayCol = "conway";
-            if (vipGuestsService.checkUnqiue(nameCol, name) && vipGuestsService.checkUnqiue(conwayCol, conway)) {
-                Integer id = requestBody.getId();
+            Integer id = requestBody.getId();
+            if (vipGuestsService.checkUnqiue(nameCol, name, id) && vipGuestsService.checkUnqiue(conwayCol, conway, id)) {
                 vipGuestsService.update(id, conway, name);
                 PageNoneDataResult<Object> result = PageNoneDataResultUtils.success();
-                result.setMessage("insert success");
+                result.setMessage("update success");
                 petsService.changeOwner(id, name);
                 String token = request.getHeader("Authorization").substring("Bearer ".length());
                 String username = jwtTokenUtil.getUsernameFromToken(token);

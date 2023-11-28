@@ -29,11 +29,6 @@ public class PetServe {
     @Setter
     private Integer price;
 
-    @TableField("unit")
-    @Getter
-    @Setter
-    private String unit;
-
     @TableField("comment")
     @Getter
     @Setter
@@ -42,5 +37,13 @@ public class PetServe {
     @TableField("is_delete")
     @Setter
     private Integer is_delete;
+
+    @TableField("create_time")
+    @Setter
+    private String create_time;
+
+    @TableField("update_time")
+    @Setter
+    private String update_time;
 
 }
